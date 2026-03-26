@@ -1,0 +1,214 @@
+{
+  "schema_version": "1.0.0",
+  "generated_at": "2026-03-26T16:45:37.392143+00:00",
+  "total_packs": 20,
+  "by_lane": {
+    "creature": 6,
+    "authority": 2,
+    "crew": 7,
+    "hostile": 3,
+    "civilian": 2
+  },
+  "roster": [
+    {
+      "subject_slug": "cargo_beast",
+      "display_name": "Cargo Beast",
+      "lane": "creature",
+      "body_family": "bipedal",
+      "run_id": "cargo_beast_p5a_20260326_060955",
+      "export_path": "exports\\cargo_beast\\cargo_beast_p5a_20260326_060955",
+      "preview_present": false,
+      "file_count": 24
+    },
+    {
+      "subject_slug": "compact_patrol",
+      "display_name": "Compact Patrol Officer",
+      "lane": "authority",
+      "body_family": "bipedal",
+      "run_id": "compact_patrol_p3_20260326_071546",
+      "export_path": "exports\\compact_patrol\\compact_patrol_p3_20260326_071546",
+      "preview_present": true,
+      "file_count": 25
+    },
+    {
+      "subject_slug": "drift_lurker",
+      "display_name": "Drift Lurker",
+      "lane": "creature",
+      "body_family": "bipedal",
+      "run_id": "drift_lurker_p5a_20260326_154405",
+      "export_path": "exports\\drift_lurker\\drift_lurker_p5a_20260326_154405",
+      "preview_present": false,
+      "file_count": 24
+    },
+    {
+      "subject_slug": "drift_maw",
+      "display_name": "Drift Maw",
+      "lane": "creature",
+      "body_family": "bipedal",
+      "run_id": "drift_maw_p3_20260326_053532",
+      "export_path": "exports\\drift_maw\\drift_maw_p3_20260326_053532",
+      "preview_present": true,
+      "file_count": 25
+    },
+    {
+      "subject_slug": "hull_diver",
+      "display_name": "Hull Diver",
+      "lane": "crew",
+      "body_family": "bipedal",
+      "run_id": "hull_diver_p3_20260326_152916",
+      "export_path": "exports\\hull_diver\\hull_diver_p3_20260326_152916",
+      "preview_present": true,
+      "file_count": 25
+    },
+    {
+      "subject_slug": "ilen_marr",
+      "display_name": "Ilen Marr",
+      "lane": "crew",
+      "body_family": "bipedal",
+      "run_id": "ilen_marr_p3_20260326_044636",
+      "export_path": "exports\\ilen_marr\\ilen_marr_p3_20260326_044636",
+      "preview_present": true,
+      "file_count": 25
+    },
+    {
+      "subject_slug": "interdiction_agent",
+      "display_name": "Compact Interdiction Agent",
+      "lane": "hostile",
+      "body_family": "bipedal",
+      "run_id": "interdiction_agent_p3_20260326_153314",
+      "export_path": "exports\\interdiction_agent\\interdiction_agent_p3_20260326_153314",
+      "preview_present": true,
+      "file_count": 25
+    },
+    {
+      "subject_slug": "kael_morrow",
+      "display_name": "Kael Morrow",
+      "lane": "crew",
+      "body_family": "bipedal",
+      "run_id": "kael_1c_20260326_033800",
+      "export_path": "exports\\kael_morrow\\kael_1c_20260326_033800",
+      "preview_present": false,
+      "file_count": 24
+    },
+    {
+      "subject_slug": "keth_healer_drone",
+      "display_name": "Keth Healer-Drone",
+      "lane": "creature",
+      "body_family": "bipedal",
+      "run_id": "keth_healer_drone_p5a_20260326_072410",
+      "export_path": "exports\\keth_healer_drone\\keth_healer_drone_p5a_20260326_072410",
+      "preview_present": true,
+      "file_count": 25
+    },
+    {
+      "subject_slug": "nera_quill",
+      "display_name": "Nera Quill",
+      "lane": "civilian",
+      "body_family": "bipedal",
+      "run_id": "nera_quill_p3_20260326_071227",
+      "export_path": "exports\\nera_quill\\nera_quill_p3_20260326_071227",
+      "preview_present": true,
+      "file_count": 25
+    },
+    {
+      "subject_slug": "orryn_broker",
+      "display_name": "Orryn Broker",
+      "lane": "civilian",
+      "body_family": "bipedal",
+      "run_id": "orryn_broker_p3_20260326_072045",
+      "export_path": "exports\\orryn_broker\\orryn_broker_p3_20260326_072045",
+      "preview_present": true,
+      "file_count": 25
+    },
+    {
+      "subject_slug": "reach_pirate",
+      "display_name": "Reach Pirate",
+      "lane": "hostile",
+      "body_family": "bipedal",
+      "run_id": "reach_pirate_p3_20260326_071816",
+      "export_path": "exports\\reach_pirate\\reach_pirate_p3_20260326_071816",
+      "preview_present": true,
+      "file_count": 25
+    },
+    {
+      "subject_slug": "scav_raider",
+      "display_name": "Scav Raider",
+      "lane": "hostile",
+      "body_family": "bipedal",
+      "run_id": "scav_raider_p3_20260326_053427",
+      "export_path": "exports\\scav_raider\\scav_raider_p3_20260326_053427",
+      "preview_present": true,
+      "file_count": 25
+    },
+    {
+      "subject_slug": "sera_vale",
+      "display_name": "Sera Vale",
+      "lane": "crew",
+      "body_family": "bipedal",
+      "run_id": "stack_a_v2_20260326_030834",
+      "export_path": "exports\\sera_vale\\stack_a_v2_20260326_030834",
+      "preview_present": false,
+      "file_count": 24
+    },
+    {
+      "subject_slug": "skitter_drone",
+      "display_name": "Skitter Drone",
+      "lane": "creature",
+      "body_family": "bipedal",
+      "run_id": "skitter_drone_p5a_20260326_060825",
+      "export_path": "exports\\skitter_drone\\skitter_drone_p5a_20260326_060825",
+      "preview_present": false,
+      "file_count": 24
+    },
+    {
+      "subject_slug": "thal",
+      "display_name": "Thal",
+      "lane": "crew",
+      "body_family": "bipedal",
+      "run_id": "thal_p3_20260326_044905",
+      "export_path": "exports\\thal\\thal_p3_20260326_044905",
+      "preview_present": true,
+      "file_count": 25
+    },
+    {
+      "subject_slug": "thal_hazard",
+      "display_name": "Thal (Hazard Suit)",
+      "lane": "crew",
+      "body_family": "bipedal",
+      "run_id": "thal_hazard_p3_20260326_151723",
+      "export_path": "exports\\thal_hazard\\thal_hazard_p3_20260326_151723",
+      "preview_present": true,
+      "file_count": 25
+    },
+    {
+      "subject_slug": "varek",
+      "display_name": "Varek",
+      "lane": "crew",
+      "body_family": "bipedal",
+      "run_id": "varek_p3_20260326_045646",
+      "export_path": "exports\\varek\\varek_p3_20260326_045646",
+      "preview_present": true,
+      "file_count": 25
+    },
+    {
+      "subject_slug": "veshan_envoy",
+      "display_name": "Veshan House Envoy",
+      "lane": "authority",
+      "body_family": "bipedal",
+      "run_id": "veshan_envoy_p3_20260326_152433",
+      "export_path": "exports\\veshan_envoy\\veshan_envoy_p3_20260326_152433",
+      "preview_present": true,
+      "file_count": 25
+    },
+    {
+      "subject_slug": "void_raptor",
+      "display_name": "Void Raptor",
+      "lane": "creature",
+      "body_family": "bipedal",
+      "run_id": "void_raptor_p5a_20260326_063319",
+      "export_path": "exports\\void_raptor\\void_raptor_p5a_20260326_063319",
+      "preview_present": false,
+      "file_count": 24
+    }
+  ]
+}
