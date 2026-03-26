@@ -62,6 +62,21 @@ python -m pipeline.foundry_gen_morph \
 - **Orryn Broker:** Lightest silhouette in the set. Loose robe, no gear, alien skin tone. Readability floor — if this reads clearly at sprite scale, the pipeline handles civilians.
 - **Keth Healer-Drone:** Non-combat arthropod. Warm amber glow, rounded body, medical manipulators. Proves the arthropod lane works for non-threatening creatures too.
 
+## Review Verdict — 2026-03-26
+
+All 5 new subjects **APPROVED**. Zero regens.
+
+| # | Subject | Verdict | Notes |
+|---|---------|---------|-------|
+| 1 | Sera Vale | Accept | Done in Batch 01 (stack_a_v2 run) |
+| 2 | Nera Quill | Accept | Institutional silhouette clean, no drift |
+| 3 | Compact Patrol Officer | Accept | Strongest read in the set — law silhouette holds |
+| 4 | Reach Pirate | Accept | Distinct from Scav Raider — calm factional threat |
+| 5 | Orryn Broker | Accept | Teal robe + pale skin = immediate civilian read |
+| 6 | Keth Healer-Drone | Accept (soft note) | Body plan reads well. Medical manipulator detail is below 48px readability ceiling — role-specific function not legible at base resolution, but class read is good enough for production |
+
+**Batch totals:** 40/40 finish-accepted, 160 captures, 0 rejects.
+
 ## R&D (separate — do NOT mix into this batch)
 
 Wing pose locking stays on its own branch. Phase 5C research does not contaminate content production.
