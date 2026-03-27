@@ -1,13 +1,14 @@
 {
   "schema_version": "1.0.0",
-  "generated_at": "2026-03-26T16:45:37.392143+00:00",
-  "total_packs": 20,
+  "generated_at": "2026-03-27T22:35:00.000000+00:00",
+  "total_packs": 26,
   "by_lane": {
     "creature": 6,
     "authority": 2,
     "crew": 7,
     "hostile": 3,
-    "civilian": 2
+    "civilian": 2,
+    "beast": 6
   },
   "roster": [
     {
@@ -207,6 +208,66 @@
       "body_family": "bipedal",
       "run_id": "void_raptor_p5a_20260326_063319",
       "export_path": "exports\\void_raptor\\void_raptor_p5a_20260326_063319",
+      "preview_present": false,
+      "file_count": 24
+    },
+    {
+      "subject_slug": "beast_rat_king",
+      "display_name": "Rat King",
+      "lane": "beast",
+      "body_family": "amorphous",
+      "run_id": "beast_rat_king_p5a_20260327_220242",
+      "export_path": "exports\\beast_rat_king\\beast_rat_king_p5a_20260327_220242",
+      "preview_present": false,
+      "file_count": 24
+    },
+    {
+      "subject_slug": "beast_lantern_angler",
+      "display_name": "Lantern Angler",
+      "lane": "beast",
+      "body_family": "tall_thin",
+      "run_id": "beast_lantern_angler_p5a_20260327_220815",
+      "export_path": "exports\\beast_lantern_angler\\beast_lantern_angler_p5a_20260327_220815",
+      "preview_present": false,
+      "file_count": 24
+    },
+    {
+      "subject_slug": "beast_grinning_idol",
+      "display_name": "Grinning Idol",
+      "lane": "beast",
+      "body_family": "wide_squat",
+      "run_id": "beast_grinning_idol_p5a_20260327_223156",
+      "export_path": "exports\\beast_grinning_idol\\beast_grinning_idol_p5a_20260327_223156",
+      "preview_present": false,
+      "file_count": 24
+    },
+    {
+      "subject_slug": "beast_spore_mother",
+      "display_name": "Spore Mother",
+      "lane": "beast",
+      "body_family": "amorphous",
+      "run_id": "beast_spore_mother_p5a_20260327_221155",
+      "export_path": "exports\\beast_spore_mother\\beast_spore_mother_p5a_20260327_221155",
+      "preview_present": false,
+      "file_count": 24
+    },
+    {
+      "subject_slug": "beast_root_puppet",
+      "display_name": "Root Puppet",
+      "lane": "beast",
+      "body_family": "tall_thin",
+      "run_id": "beast_root_puppet_p5a_20260327_221324",
+      "export_path": "exports\\beast_root_puppet\\beast_root_puppet_p5a_20260327_221324",
+      "preview_present": false,
+      "file_count": 24
+    },
+    {
+      "subject_slug": "beast_mud_revenant",
+      "display_name": "Mud Revenant",
+      "lane": "beast",
+      "body_family": "amorphous",
+      "run_id": "beast_mud_revenant_p5a_20260327_223323",
+      "export_path": "exports\\beast_mud_revenant\\beast_mud_revenant_p5a_20260327_223323",
       "preview_present": false,
       "file_count": 24
     }
