@@ -1,8 +1,9 @@
 {
   "schema_version": "1.0.0",
-  "generated_at": "2026-03-27T23:04:33.934293+00:00",
-  "total_packs": 82,
+  "generated_at": "2026-03-27T23:38:34.653979+00:00",
+  "total_packs": 92,
   "by_lane": {
+    "beast": 16,
     "townsfolk": 16,
     "goblin": 8,
     "hero": 8,
@@ -10,13 +11,42 @@
     "villain": 8,
     "zombie": 8,
     "crew": 7,
-    "beast": 6,
     "creature": 6,
     "hostile": 3,
     "authority": 2,
     "civilian": 2
   },
   "roster": [
+    {
+      "subject_slug": "beast_bell_warden",
+      "display_name": "Beast Bell Warden",
+      "lane": "beast",
+      "body_family": "bipedal",
+      "run_id": "beast_bell_warden_p3_20260327_212632",
+      "export_path": "exports/beast_bell_warden/beast_bell_warden_p3_20260327_212632",
+      "preview_present": true,
+      "file_count": 26
+    },
+    {
+      "subject_slug": "beast_bone_weaver",
+      "display_name": "Beast Bone Weaver",
+      "lane": "beast",
+      "body_family": "arthropod",
+      "run_id": "beast_bone_weaver_p5a_20260327_232151",
+      "export_path": "exports/beast_bone_weaver/beast_bone_weaver_p5a_20260327_232151",
+      "preview_present": true,
+      "file_count": 25
+    },
+    {
+      "subject_slug": "beast_clock_golem",
+      "display_name": "Beast Clock Golem",
+      "lane": "beast",
+      "body_family": "wide_squat",
+      "run_id": "beast_clock_golem_p3_20260327_211436",
+      "export_path": "exports/beast_clock_golem/beast_clock_golem_p3_20260327_211436",
+      "preview_present": true,
+      "file_count": 26
+    },
     {
       "subject_slug": "beast_grinning_idol",
       "display_name": "Beast Grinning Idol",
@@ -28,6 +58,36 @@
       "file_count": 25
     },
     {
+      "subject_slug": "beast_hive_keeper",
+      "display_name": "Beast Hive Keeper",
+      "lane": "beast",
+      "body_family": "wide_squat",
+      "run_id": "beast_hive_keeper_p5a_20260327_232022",
+      "export_path": "exports/beast_hive_keeper/beast_hive_keeper_p5a_20260327_232022",
+      "preview_present": true,
+      "file_count": 25
+    },
+    {
+      "subject_slug": "beast_hollow_knight",
+      "display_name": "Beast Hollow Knight",
+      "lane": "beast",
+      "body_family": "bipedal",
+      "run_id": "beast_hollow_knight_p3_20260327_210348",
+      "export_path": "exports/beast_hollow_knight/beast_hollow_knight_p3_20260327_210348",
+      "preview_present": true,
+      "file_count": 26
+    },
+    {
+      "subject_slug": "beast_ink_shade",
+      "display_name": "Beast Ink Shade",
+      "lane": "beast",
+      "body_family": "tall_thin",
+      "run_id": "beast_ink_shade_p3_20260327_212456",
+      "export_path": "exports/beast_ink_shade/beast_ink_shade_p3_20260327_212456",
+      "preview_present": true,
+      "file_count": 26
+    },
+    {
       "subject_slug": "beast_lantern_angler",
       "display_name": "Beast Lantern Angler",
       "lane": "beast",
@@ -36,6 +96,16 @@
       "export_path": "exports/beast_lantern_angler/beast_lantern_angler_p5a_20260327_220815",
       "preview_present": true,
       "file_count": 25
+    },
+    {
+      "subject_slug": "beast_mirror_stalker",
+      "display_name": "Beast Mirror Stalker",
+      "lane": "beast",
+      "body_family": "tall_thin",
+      "run_id": "beast_mirror_stalker_p3_20260327_210616",
+      "export_path": "exports/beast_mirror_stalker/beast_mirror_stalker_p3_20260327_210616",
+      "preview_present": true,
+      "file_count": 26
     },
     {
       "subject_slug": "beast_mud_revenant",
@@ -74,6 +144,36 @@
       "body_family": "amorphous",
       "run_id": "beast_spore_mother_p5a_20260327_221155",
       "export_path": "exports/beast_spore_mother/beast_spore_mother_p5a_20260327_221155",
+      "preview_present": true,
+      "file_count": 25
+    },
+    {
+      "subject_slug": "beast_teeth_collector",
+      "display_name": "Beast Teeth Collector",
+      "lane": "beast",
+      "body_family": "bipedal",
+      "run_id": "beast_teeth_collector_p3_20260327_213101",
+      "export_path": "exports/beast_teeth_collector/beast_teeth_collector_p3_20260327_213101",
+      "preview_present": true,
+      "file_count": 26
+    },
+    {
+      "subject_slug": "beast_throat_singer",
+      "display_name": "Beast Throat Singer",
+      "lane": "beast",
+      "body_family": "tall_thin",
+      "run_id": "beast_throat_singer_p3_20260327_212144",
+      "export_path": "exports/beast_throat_singer/beast_throat_singer_p3_20260327_212144",
+      "preview_present": true,
+      "file_count": 26
+    },
+    {
+      "subject_slug": "beast_wyvern",
+      "display_name": "Beast Wyvern",
+      "lane": "beast",
+      "body_family": "winged",
+      "run_id": "beast_wyvern_p5a_20260327_231740",
+      "export_path": "exports/beast_wyvern/beast_wyvern_p5a_20260327_231740",
       "preview_present": true,
       "file_count": 25
     },
