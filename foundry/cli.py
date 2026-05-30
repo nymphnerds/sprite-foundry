@@ -1998,6 +1998,21 @@ def cmd_ship_export(args):
     conn.close()
 
 
+# -- foundry generate-nymphscore ------------------------------
+
+def cmd_generate_nymphscore(args):
+    """Generate a run through Nymphs Image while preserving Foundry lifecycle."""
+    from pipeline import foundry_gen_nymphscore
+
+    config_path = Path(args.config)
+    if not config_path.exists():
+        print(f"Config not found: {config_path}")
+        sys.exit(1)
+    with open(config_path, encoding="utf-8") as f:
+        config = json.load(f)
+    foundry_gen_nymphscore.generate_and_register(config, args)
+
+
 # -- CLI argument parser --------------------------------------
 
 def build_parser() -> argparse.ArgumentParser:
@@ -2035,6 +2050,32 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--state", help="Initial state (default: generated)")
     p.add_argument("--artifacts", nargs=2, action="append", metavar=("KIND", "PATH"),
                    help="Artifact to register (e.g. --artifacts raw path/to/raw.png)")
+
+    # generate-nymphscore
+    p = sub.add_parser("generate-nymphscore", help="Generate an 8-direction run through Nymphs Image / Z-Image")
+    p.add_argument("--config", required=True, help="Path to character config JSON")
+    p.add_argument("--nymphscore-url", default="http://127.0.0.1:8090", help="Nymphs Image API URL")
+    p.add_argument("--model-id", default="Tongyi-MAI/Z-Image-Turbo", help="Nymphs Image model id")
+    p.add_argument("--lora-path", default="", help="Z-Image LoRA path; defaults to latest /api/loras entry")
+    p.add_argument("--lora-trigger", default="pxlstl", help="Prompt trigger for the selected LoRA")
+    p.add_argument("--lora-scale", type=float, default=0.85)
+    p.add_argument("--seed", type=int, help="Override config seed")
+    p.add_argument("--seed-step", type=int, default=1)
+    p.add_argument("--width", type=int, default=1024)
+    p.add_argument("--height", type=int, default=1024)
+    p.add_argument("--steps", type=int, default=9)
+    p.add_argument("--guidance-scale", type=float, default=0.0)
+    p.add_argument("--nunchaku-rank", type=int, default=32)
+    p.add_argument("--nunchaku-precision", default="auto", choices=["auto", "int4", "fp4"])
+    p.add_argument("--sprite-size", type=int, default=96)
+    p.add_argument("--palette-colors", type=int, default=0)
+    p.add_argument("--bg-tolerance", type=int, default=35)
+    p.add_argument("--crop-padding", type=float, default=0.08)
+    p.add_argument("--raw-cell-size", type=int, default=192)
+    p.add_argument("--preview-cell-size", type=int, default=192)
+    p.add_argument("--green-screen", dest="no_green_screen", action="store_false", default=False)
+    p.add_argument("--no-green-screen", dest="no_green_screen", action="store_true")
+    p.add_argument("--no-check", action="store_true", help="Skip immediate Foundry mechanical gates")
 
     # check
     p = sub.add_parser("check", help="Run mechanical gates on a run")
@@ -2147,6 +2188,7 @@ def main():
         "subject-add": cmd_subject_add,
         "register-run": cmd_register_run,
         "register-attempt": cmd_register_attempt,
+        "generate-nymphscore": cmd_generate_nymphscore,
         "check": cmd_check,
         "review-show": cmd_review_show,
         "review-accept": cmd_review_accept,
