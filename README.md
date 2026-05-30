@@ -1,3 +1,18 @@
+## NymphsCore Fork
+
+This fork adapts Sprite Foundry to run generation through NymphsCore/Nymphs
+Image instead of ComfyUI. NymphsCore is a local modular AI runtime/manager, and
+Nymphs Image provides the Z-Image backend used here for sprite generation.
+
+The goal is to keep Sprite Foundry's excellent review, gating, lifecycle, and
+export system intact while swapping in a Nymphs-native generation path:
+`foundry generate-nymphscore`.
+
+Huge thanks to the original Sprite Foundry author and MCP Tool Shop for making
+this clean, thoughtful system available under MIT.
+
+---
+
 <p align="center">
   <a href="README.ja.md">日本語</a> | <a href="README.zh.md">中文</a> | <a href="README.es.md">Español</a> | <a href="README.fr.md">Français</a> | <a href="README.hi.md">हिन्दी</a> | <a href="README.it.md">Italiano</a> | <a href="README.pt-BR.md">Português (BR)</a>
 </p>
@@ -16,32 +31,7 @@
   <a href="https://mcp-tool-shop.github.io/sprite-foundry/"><img src="https://img.shields.io/badge/docs-handbook-blue" alt="Handbook"></a>
 </p>
 
----
-
 Sprite Foundry is a local-only asset pipeline that generates, reviews, and exports 8-direction pixel sprites with normal and depth maps. It drives ComfyUI for generation with ControlNet morphology control (8 body classes), SQLite for lifecycle tracking, and Godot 4.6 for finish-lab lighting verification — all controlled from a single CLI.
-
-## NymphsCore Fork Mode
-
-This fork adds a NymphsCore/Nymphs Image generation backend while keeping the rest
-of Sprite Foundry intact: SQLite lifecycle tracking, mechanical gates, raw/pixel
-review queues, map derivation, finish review, deterministic exports, and the
-existing character config format.
-
-The new backend command is:
-
-```bash
-python -m foundry.cli generate-nymphscore \
-  --config pipeline/chars/thal.json \
-  --nymphscore-url http://127.0.0.1:8090 \
-  --lora-path /home/nymph/LoRA/loras/nymphs-sprite/z-image-pixel-art.safetensors \
-  --lora-trigger pxlstl \
-  --sprite-size 96
-```
-
-If `--lora-path` is omitted, the runner asks Nymphs Image `/api/loras` for the
-latest available LoRA. The generated run is registered as `NymphScore_ZImage`,
-with the same `raw` and `pixel` artifact kinds used by the original Foundry
-review and export system.
 
 ## Architecture
 
