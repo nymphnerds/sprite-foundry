@@ -1,15 +1,18 @@
 ## NymphsCore Fork
 
-This fork adapts Sprite Foundry to run generation through NymphsCore/Nymphs
-Image instead of ComfyUI. NymphsCore is a local modular AI runtime/manager, and
-Nymphs Image provides the Z-Image backend used here for sprite generation.
+This fork adapts Sprite Foundry to run generation through NymphsCore instead of
+ComfyUI. NymphsCore is a local modular AI runtime/manager; Nymphs Image provides
+the Z-Image Turbo backend used here, with Nunchaku acceleration, Z-Image LoRA
+support, configurable sprite sizes, and planned ControlNet/depth parity.
 
-The goal is to keep Sprite Foundry's excellent review, gating, lifecycle, and
-export system intact while swapping in a Nymphs-native generation path:
-`foundry generate-nymphscore`.
+The goal is to keep Sprite Foundry's excellent review, gating, lifecycle,
+map/finish, and export system intact while swapping in a Nymphs-native
+generation path: `foundry generate-nymphscore`.
 
 Huge thanks to the original Sprite Foundry author and MCP Tool Shop for making
 this clean, thoughtful system available under MIT.
+
+If this NymphsCore path is useful upstream, we'd be happy to compare notes.
 
 ---
 
