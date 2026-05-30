@@ -4,14 +4,27 @@ set -euo pipefail
 echo "=== Sprite Foundry — verify ==="
 
 FAIL=0
+PYTHON_BIN="${PYTHON_BIN:-}"
+if [ -z "$PYTHON_BIN" ]; then
+    if command -v python >/dev/null 2>&1; then
+        PYTHON_BIN=python
+    elif command -v python3 >/dev/null 2>&1; then
+        PYTHON_BIN=python3
+    else
+        echo "FAIL: neither python nor python3 found"
+        exit 1
+    fi
+fi
+
+echo "Using Python: $PYTHON_BIN"
 
 # 1. Python module imports
 echo "Checking Python module imports..."
-python -c "from foundry import db; from foundry import cli; print('OK: foundry module imports')" || { echo "FAIL: foundry module import"; FAIL=1; }
+"$PYTHON_BIN" -c "from foundry import db; from foundry import cli; print('OK: foundry module imports')" || { echo "FAIL: foundry module import"; FAIL=1; }
 
 # 2. Database schema
 echo "Checking database constants..."
-python -c "
+"$PYTHON_BIN" -c "
 from foundry.db import DIRECTIONS, LIFECYCLE_STATES, SCHEMA_VERSION
 assert len(DIRECTIONS) == 8, f'Expected 8 directions, got {len(DIRECTIONS)}'
 assert SCHEMA_VERSION >= 2, f'Schema version {SCHEMA_VERSION} too old'
@@ -20,7 +33,7 @@ print(f'OK: {len(DIRECTIONS)} directions, {len(LIFECYCLE_STATES)} states, schema
 
 # 3. CLI parser builds without error
 echo "Checking CLI parser..."
-python -c "from foundry.cli import build_parser; p = build_parser(); print('OK: CLI parser builds')" || { echo "FAIL: CLI parser"; FAIL=1; }
+"$PYTHON_BIN" -c "from foundry.cli import build_parser; p = build_parser(); print('OK: CLI parser builds')" || { echo "FAIL: CLI parser"; FAIL=1; }
 
 # 4. Export packs structure
 echo "Checking export packs..."
@@ -47,7 +60,7 @@ for manifest in exports/*/manifest.json exports/*/*/manifest.json; do
     fi
 
     # Validate manifest JSON
-    python -c "import json; json.load(open('$manifest'))" 2>/dev/null || {
+    "$PYTHON_BIN" -c "import json; json.load(open('$manifest'))" 2>/dev/null || {
         echo "  INVALID JSON: $manifest"
         PACK_ERRORS=$((PACK_ERRORS + 1))
     }
@@ -64,7 +77,7 @@ fi
 # 5. Roster index
 echo "Checking roster index..."
 if [ -f "exports/roster_index.json" ]; then
-    python -c "
+    "$PYTHON_BIN" -c "
 import json
 with open('exports/roster_index.json') as f:
     idx = json.load(f)

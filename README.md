@@ -34,14 +34,14 @@ If this NymphsCore path is useful upstream, we'd be happy to compare notes.
   <a href="https://mcp-tool-shop.github.io/sprite-foundry/"><img src="https://img.shields.io/badge/docs-handbook-blue" alt="Handbook"></a>
 </p>
 
-Sprite Foundry is a local-only asset pipeline that generates, reviews, and exports 8-direction pixel sprites with normal and depth maps. It drives ComfyUI for generation with ControlNet morphology control (8 body classes), SQLite for lifecycle tracking, and Godot 4.6 for finish-lab lighting verification — all controlled from a single CLI.
+Sprite Foundry is a local-only asset pipeline that generates, reviews, and exports 8-direction pixel sprites with normal and depth maps. This fork drives Nymphs Image / Z-Image Turbo for generation, uses SQLite for lifecycle tracking, and keeps the Godot 4.6 finish-lab lighting verification path.
 
 ## Architecture
 
 ```
-Subject Sheet ──► ComfyUI Generation ──► Mechanical Gates
-                  (SDXL + LoRA +          (transparency,
-                   ControlNet)             dimensions, count)
+Subject Sheet ──► Nymphs Image Generation ──► Mechanical Gates
+                  (Z-Image Turbo +           (transparency,
+                   Nunchaku + LoRA)           dimensions, count)
                                                 │
                                                 ▼
                                         Raw/Pixel Review
@@ -79,7 +79,7 @@ Subject Sheet ──► ComfyUI Generation ──► Mechanical Gates
 
 ## Monster Lane
 
-Non-humanoid creatures use body-class-specific ControlNet depth guides instead of the standard humanoid skeleton. Each body class has its own depth reference silhouette, ControlNet strength, and timing parameters.
+Non-humanoid creatures use body-class-specific depth guides in the original ComfyUI path. This fork keeps those configs and review gates while the NymphsCore backend grows toward Z-Image ControlNet/depth parity.
 
 | Body Class | Depth Strength | End % | Creatures |
 |------------|---------------|-------|-----------|
@@ -90,7 +90,7 @@ Non-humanoid creatures use body-class-specific ControlNet depth guides instead o
 Depth guides are joint-free primitives (blobs, pillars, columns) that lock in mass and orientation without dictating skeleton or limb placement. The `body_class` field in character configs auto-selects the correct preset:
 
 ```bash
-# Body class auto-resolved from config
+# Original ComfyUI body class path
 python -m pipeline.foundry_gen_morph --config pipeline/chars/beast_rat_king.json
 
 # CLI override
@@ -101,7 +101,7 @@ python -m pipeline.foundry_gen_morph --config pipeline/chars/beast_rat_king.json
 
 ```
 exports/{subject_slug}/{run_id}/
-├── albedo/    8 × 48px transparent PNGs
+├── albedo/    8 × transparent PNGs
 ├── normal/    8 × matching normal maps
 ├── depth/     8 × matching depth maps
 ├── preview/   contact sheet
@@ -109,15 +109,19 @@ exports/{subject_slug}/{run_id}/
 ```
 
 - 8 directions: front, front_left, left, back_left, back, back_right, right, front_right
-- 48×48 transparent PNG, center_bottom pivot
+- Original contract: 48×48 transparent PNG, center_bottom pivot
+- NymphsCore fork: configurable `--sprite-size` from 24 to 512, default 96
 - Consumers validate `schema_version: "1.0.0"` before loading
 
 ## Prerequisites
 
 - Python 3.11+
-- [ComfyUI](https://github.com/comfyanonymous/ComfyUI) running locally (for generation)
+- Nymphs Image running locally, usually at `http://127.0.0.1:8090`
+- Z-Image Turbo model with Nunchaku runtime support
+- A Z-Image Turbo-compatible sprite/pixel-art LoRA
+- ComfyUI is optional legacy/reference runtime for the original generation scripts
 - Godot 4.6 (for finish lab rendering)
-- NVIDIA GPU recommended (RTX 5080 / 16 GB VRAM tested)
+- NVIDIA GPU recommended
 
 ## Quick Start
 
@@ -134,6 +138,12 @@ python -m foundry subject-add sera_vale "Sera Vale" --role crew --consumer star-
 
 # Check the full pipeline status
 python -m foundry status
+
+# Generate through Nymphs Image / Z-Image Turbo
+python -m foundry.cli generate-nymphscore \
+  --config pipeline/chars/thal.json \
+  --nymphscore-url http://127.0.0.1:8090 \
+  --sprite-size 96
 ```
 
 ## CLI Commands
@@ -142,7 +152,8 @@ python -m foundry status
 |---------|-------------|
 | `init` | Initialize the foundry SQLite registry |
 | `subject-add` | Register a new character subject |
-| `register-run` | Record a ComfyUI generation run |
+| `generate-nymphscore` | Generate and register a run through Nymphs Image / Z-Image Turbo |
+| `register-run` | Record a generation run |
 | `register-attempt` | Record an individual attempt within a run |
 | `check` | Run mechanical validation gates |
 | `review-show` | Display review queue for a run |
@@ -166,12 +177,12 @@ python -m foundry status
 
 Sprite Foundry is a **local developer tool**. It does not:
 
-- Access the network (ComfyUI runs on localhost)
+- Access external services by default; generation calls local Nymphs Image on localhost
 - Handle secrets, tokens, or credentials
 - Collect or send telemetry
 - Write outside its own working directory
 
-File operations are constrained to `exports/`, `bakeoff/`, `boards/`, `derived/`, and the SQLite registry. Subprocess calls are limited to ComfyUI's local API and Godot headless rendering.
+File operations are constrained to `exports/`, `bakeoff/`, `boards/`, `derived/`, and the SQLite registry. Subprocess calls are limited to local generation APIs and Godot headless rendering.
 
 ## License
 

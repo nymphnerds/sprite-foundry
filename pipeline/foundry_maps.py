@@ -2,7 +2,8 @@
 Phase 3 — Foundry-integrated map derivation.
 
 Derives normal + depth maps for all 8 directions of a run's accepted sprites.
-Registers map artifacts in the foundry registry.
+Registers map artifacts in the foundry registry. The output map size follows
+the run's recorded sprite_target, so NymphsCore runs can use 48, 96, 128, etc.
 
 Usage:
     python -m pipeline.foundry_maps --run <run_id>
@@ -20,7 +21,7 @@ import numpy as np
 
 COMFY_URL = "http://127.0.0.1:8188"
 FOUNDRY_ROOT = Path(__file__).parent.parent
-SPRITE_TARGET = 48
+DEFAULT_SPRITE_TARGET = 48
 
 DIRECTIONS = [
     "front", "front_left", "left", "back_left",
@@ -162,6 +163,8 @@ def derive_maps(run_id: str):
         conn.close()
         return
 
+    target = int(run["sprite_target"] or DEFAULT_SPRITE_TARGET)
+
     # Output directory for maps
     maps_dir = FOUNDRY_ROOT / "bakeoff" / f"{run_id}_maps"
     maps_dir.mkdir(parents=True, exist_ok=True)
@@ -170,7 +173,7 @@ def derive_maps(run_id: str):
 
     print(f"\n{'=' * 60}")
     print(f"MAP DERIVATION: {char_name}")
-    print(f"Run: {run_id}  ({len(attempts)} directions)")
+    print(f"Run: {run_id}  ({len(attempts)} directions, target={target}px)")
     print(f"Output: {maps_dir}")
     print(f"{'=' * 60}\n")
 
@@ -219,7 +222,7 @@ def derive_maps(run_id: str):
                 f.write(img_data)
 
             normal_raw = Image.open(normal_raw_path)
-            normal_px = pixelate_map(normal_raw, SPRITE_TARGET)
+            normal_px = pixelate_map(normal_raw, target)
             normal_px_path = maps_dir / f"{direction}_normal.png"
             normal_px.save(str(normal_px_path))
 
@@ -252,7 +255,7 @@ def derive_maps(run_id: str):
                 f.write(img_data)
 
             depth_raw = Image.open(depth_raw_path)
-            depth_px = pixelate_map(depth_raw, SPRITE_TARGET)
+            depth_px = pixelate_map(depth_raw, target)
             depth_px_path = maps_dir / f"{direction}_depth.png"
             depth_px.save(str(depth_px_path))
 

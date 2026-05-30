@@ -305,6 +305,7 @@ def generate_and_register(config: dict[str, Any], args: argparse.Namespace) -> s
     pixel_paths: dict[str, Path] = {}
     generated_dirs: list[str] = []
     responses: dict[str, Any] = {}
+    direction_seeds: dict[str, int] = {}
 
     for index, (direction_name, direction_prompt) in enumerate(DIRECTIONS, start=1):
         item_seed = seed + (index - 1) * args.seed_step
@@ -343,6 +344,7 @@ def generate_and_register(config: dict[str, Any], args: argparse.Namespace) -> s
 
         raw_paths[direction_name] = raw_path
         pixel_paths[direction_name] = pixel_path
+        direction_seeds[direction_name] = item_seed
         responses[direction_name] = response
         generated_dirs.append(direction_name)
         print("OK")
@@ -391,6 +393,7 @@ def generate_and_register(config: dict[str, Any], args: argparse.Namespace) -> s
                 "sprite_size": args.sprite_size,
                 "timestamp": ts,
                 "directions": generated_dirs,
+                "direction_seeds": direction_seeds,
                 "nymphs_image_responses": responses,
             },
             indent=2,
@@ -425,7 +428,7 @@ def generate_and_register(config: dict[str, Any], args: argparse.Namespace) -> s
             run_id,
             direction_name,
             "--seed",
-            str(seed),
+            str(direction_seeds[direction_name]),
             "--artifacts",
             "raw",
             str(raw_paths[direction_name]),
