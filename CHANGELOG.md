@@ -5,6 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/),
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [1.2.6] - 2026-06-06
+
+### Fixed
+
+- Sprite Foundry generation now starts the selected Nymphs Image / Z-Image
+  backend automatically before running the Foundry `generate-nymphscore` path.
+- The workbench no longer blocks Generate merely because the backend is stopped
+  when required weights and LoRAs are present.
+- Replaced the dead Runtime `Foundry` button with an explicit `Start Backend`
+  action and made `Check` show its status output instead of silently swallowing
+  it.
+- Status/details wording now says Generate will start the backend automatically.
+
 ## [1.2.5] - 2026-06-06
 
 ### Fixed

@@ -675,7 +675,7 @@
       <section class="section">
         <div class="section-title"><span>Runtime</span><span id="runtime-chip">Backend</span></div>
         <div class="command-row three no-top">
-          <button id="foundry-status" type="button">Foundry</button>
+          <button id="start-backend" type="button">Start Backend</button>
           <button id="refresh-status" type="button">Refresh</button>
           <button id="check-runtime" type="button">Check</button>
         </div>
@@ -1016,11 +1016,11 @@
 
       $("status-pill").textContent = statusLabel();
       $("status-pill").className = statusClass();
-      $("runtime-chip").textContent = zRunning ? "ready" : "start backend";
+      $("runtime-chip").textContent = zRunning ? "ready" : "starts on generate";
       $("model-chip").textContent = zModelChipText();
-      $("runtime-text").textContent = values.zimage_url ? `Backend ${values.zimage_url} / ${zRunning ? "running" : "not running"} / ${zReady ? "models ready" : "fetch models"}` : "Backend";
+      $("runtime-text").textContent = values.zimage_url ? `Backend ${values.zimage_url} / ${zRunning ? "running" : "will start on Generate"} / ${zReady ? "models ready" : "fetch models"}` : "Backend";
       $("selected-model-text").textContent = values.selected_lora_path ? basename(values.selected_lora_path) : (loras.join(", ") || "none");
-      $("progress-detail").textContent = `Backend ${zRunning && zReady ? "ready" : "not ready"} | ControlNet ${controlReady ? "ready" : "missing"} | LoRA ${spriteLoraDownloaded} found`;
+      $("progress-detail").textContent = `Backend ${zReady ? (zRunning ? "ready" : "will start") : "missing models"} | ControlNet ${controlReady ? "ready" : "missing"} | LoRA ${spriteLoraDownloaded} found`;
       populateLoraChoices(values);
       if (values.selected_lora_trigger) $("lora-trigger").value = values.selected_lora_trigger;
       if (values.selected_lora_scale) $("lora-scale").value = values.selected_lora_scale;
@@ -1620,8 +1620,8 @@
     function generationReadyReason() {
       const values = state.statusValues || {};
       if (!yes(values.controlnet_ready)) return "Fetch ControlNet from the Sprite Foundry details page first.";
+      if (!yes(values.zimage_installed)) return "Install Nymphs Image / Z-Image first.";
       if (!yes(values.zimage_models_ready)) return "Fetch the Z-Image base/Nunchaku model files first.";
-      if (!yes(values.zimage_running)) return "Start or open Nymphs Image / Z-Image before generating.";
       if (!$("lora-choice").value || !state.selectedLoraPath) return "Download or choose a Z-Image pixel-art LoRA first.";
       return "";
     }
@@ -1751,9 +1751,30 @@
     }
 
     $("refresh-status").addEventListener("click", refreshStatus);
-    $("foundry-status").addEventListener("click", () => moduleAction("foundry_status").catch(() => {}));
-    $("check-runtime").addEventListener("click", () => moduleAction("status").catch(() => {}));
-    $("open-outputs").addEventListener("click", () => moduleAction("open_outputs").catch(() => {}));
+    $("start-backend").addEventListener("click", () => {
+      if (state.busy) return;
+      setBusy(true, "Backend");
+      setProgress("Backend", "Starting Nymphs Image / Z-Image.", 10);
+      moduleAction("start_backend", [], { busy: false })
+        .then((text) => {
+          append(text);
+          setProgress("Backend", "Backend ready.", 100);
+          return refreshStatus();
+        })
+        .catch((error) => {
+          append(`ERROR: ${error.message || error}`);
+          setProgress("Error", error.message || "Backend start failed.", 0);
+        })
+        .finally(() => setBusy(false));
+    });
+    $("check-runtime").addEventListener("click", () => {
+      moduleAction("status")
+        .then((text) => append(text))
+        .catch((error) => append(`ERROR: ${error.message || error}`));
+    });
+    $("open-outputs").addEventListener("click", () => {
+      moduleAction("open_outputs").catch((error) => append(`ERROR: ${error.message || error}`));
+    });
     $("strip-prev").addEventListener("click", () => stepOutput(-1));
     $("strip-next").addEventListener("click", () => stepOutput(1));
     $("choose-folder").addEventListener("click", () => {
@@ -1794,7 +1815,7 @@
       renderGallery();
       $("result-image").style.display = "none";
       $("empty").hidden = false;
-      setProgress("Generate", "Running Sprite Foundry.", 10);
+      setProgress("Generate", "Starting backend, then running Sprite Foundry.", 10);
       setBusy(true, "Foundry");
       (async () => {
         const text = await moduleAction("foundry_generate", buildModuleArgs(), { busy: false });

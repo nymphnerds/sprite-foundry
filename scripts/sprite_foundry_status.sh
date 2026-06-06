@@ -228,7 +228,7 @@ if [[ -f "${SPRITE_FOUNDRY_MARKER_FILE}" ]]; then
   elif [[ "${zimage_running}" != "true" ]]; then
     state="installed"
     health="ok"
-    detail="Sprite Foundry is ready. Start or open Nymphs Image / Z-Image before generating."
+    detail="Sprite Foundry assets are ready. Generate will start Nymphs Image / Z-Image automatically."
   fi
 fi
 
@@ -243,7 +243,11 @@ if [[ -f "${SPRITE_FOUNDRY_UI_PID_FILE}" ]]; then
       running=true
       state="running"
       health="ok"
-      detail="${SPRITE_FOUNDRY_MODULE_NAME} UI is running at ${SPRITE_FOUNDRY_UI_URL}."
+      if [[ "${zimage_running}" == "true" ]]; then
+        detail="${SPRITE_FOUNDRY_MODULE_NAME} UI is running. Backend is ready at ${SPRITE_FOUNDRY_ZIMAGE_URL}."
+      else
+        detail="${SPRITE_FOUNDRY_MODULE_NAME} UI is running. Generate will start Nymphs Image / Z-Image automatically."
+      fi
     else
       running=true
       state="running"

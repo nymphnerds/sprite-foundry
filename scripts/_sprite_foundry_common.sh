@@ -121,6 +121,30 @@ with urlopen(sys.argv[1], timeout=1.5) as response:
 PY
 }
 
+sprite_foundry_start_zimage_backend() {
+  if sprite_foundry_probe_url "${SPRITE_FOUNDRY_ZIMAGE_URL}/server_info" >/dev/null 2>&1; then
+    printf 'Backend already running: %s\n' "${SPRITE_FOUNDRY_ZIMAGE_URL}"
+    return 0
+  fi
+
+  local start_script
+  if ! start_script="$(sprite_foundry_zimage_script zimage_start.sh 2>/dev/null)"; then
+    printf 'ERROR: Nymphs Image / Z-Image is required but no zimage_start.sh was found.\n' >&2
+    return 1
+  fi
+
+  printf 'Starting backend: Nymphs Image / Z-Image\n'
+  "${start_script}"
+
+  if sprite_foundry_probe_url "${SPRITE_FOUNDRY_ZIMAGE_URL}/server_info" >/dev/null 2>&1; then
+    printf 'Backend ready: %s\n' "${SPRITE_FOUNDRY_ZIMAGE_URL}"
+    return 0
+  fi
+
+  printf 'ERROR: Z-Image start finished, but %s/server_info did not answer.\n' "${SPRITE_FOUNDRY_ZIMAGE_URL}" >&2
+  return 1
+}
+
 sprite_foundry_repo_cache_dir() {
   local repo_id="$1"
   local repo_path="${repo_id//\//--}"
