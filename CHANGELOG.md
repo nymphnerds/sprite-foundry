@@ -5,17 +5,24 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/),
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
-## [1.2.1] - 2026-06-06
+## [1.2.2] - 2026-06-06
 
 ### Changed
 
 - Removed the generic Manager details-page generation form. Generation method
   selection belongs inside the module-owned Sprite Foundry UI.
+- Removed raw `Foundry Status` and `Foundry Command` buttons from the normal
+  Manager details page. Those are internal workflow tools, not standard module
+  detail actions.
 - Added an explicit `Open UI` installed action so the Manager details page opens
   the real Nymphs-style Sprite Foundry workbench.
 - Added a Sprite Foundry-owned details-page `Model Fetch` action for
   `Fetch ControlNet`. It delegates to Nymphs Image for the shared Z-Image
   ControlNet 2.1 weight, but the user workflow starts from Sprite Foundry.
+- Added the standard optional Hugging Face token field to Sprite Foundry's
+  details-page `Model Fetch` group.
+- Changed details-page `Open Outputs` and `Logs` actions to the same result
+  modes used by other Nymphs modules.
 - Added Sprite Foundry status cache reporting so the details page shows
   `sprite_foundry_controlnet_2_1` as downloaded after the shared ControlNet
   weight is fetched.

@@ -3,7 +3,7 @@
   "id": "sprite-foundry",
   "name": "Sprite Foundry",
   "short_name": "SF",
-  "version": "1.2.1",
+  "version": "1.2.2",
   "description": "Foundry-native 8-direction sprite generation, review, lifecycle, and export pipeline for NymphsCore.",
   "category": "image",
   "kind": "sprite-foundry",
@@ -102,6 +102,30 @@
             "url": "https://github.com/nymphnerds/zimage"
           }
         ],
+        "fields": [
+          {
+            "name": "controlnet_profile",
+            "type": "select",
+            "label": "Download",
+            "arg": "--model",
+            "default": "zimage_controlnet_2_1",
+            "options": [
+              {
+                "label": "Z-Image ControlNet 2.1",
+                "value": "zimage_controlnet_2_1",
+                "description": "Required by Sprite Foundry direction control"
+              }
+            ]
+          },
+          {
+            "name": "hf_token",
+            "type": "secret",
+            "label": "Hugging Face token",
+            "secret_id": "huggingface.token",
+            "env": "NYMPHS3D_HF_TOKEN",
+            "optional": true
+          }
+        ],
         "submit": {
           "label": "Fetch ControlNet"
         }
@@ -116,31 +140,17 @@
         "visibility": "installed"
       },
       {
-        "id": "foundry_status",
-        "label": "Foundry Status",
-        "entrypoint": "foundry_status",
-        "result": "show_output",
-        "visibility": "installed"
-      },
-      {
-        "id": "foundry_cli",
-        "label": "Foundry Command",
-        "entrypoint": "foundry_cli",
-        "result": "show_output",
-        "visibility": "installed"
-      },
-      {
         "id": "open_outputs",
         "label": "Open Outputs",
         "entrypoint": "open_outputs",
-        "result": "show_output",
+        "result": "open_directory",
         "visibility": "installed"
       },
       {
         "id": "logs",
         "label": "Logs",
         "entrypoint": "logs",
-        "result": "show_logs",
+        "result": "open_notepad",
         "visibility": "installed"
       }
     ]
