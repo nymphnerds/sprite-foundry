@@ -28,6 +28,7 @@ for _ in 1 2 3 4 5 6 7 8 9 10; do
   if sprite_foundry_probe_url "${SPRITE_FOUNDRY_UI_URL}/health" >/dev/null 2>&1; then
     echo "result=local_url"
     echo "url=${SPRITE_FOUNDRY_UI_URL}/nymph"
+    echo "module_ui_url=${SPRITE_FOUNDRY_UI_URL}/nymph"
     echo "ui_url=${SPRITE_FOUNDRY_UI_URL}/nymph"
     exit 0
   fi

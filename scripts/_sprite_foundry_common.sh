@@ -18,6 +18,10 @@ SPRITE_FOUNDRY_UI_LOG_FILE="${SPRITE_FOUNDRY_LOGS_DIR}/sprite-foundry-ui.log"
 SPRITE_FOUNDRY_ZIMAGE_URL="${SPRITE_FOUNDRY_ZIMAGE_URL:-http://127.0.0.1:8090}"
 SPRITE_FOUNDRY_LORA_ROOT="${SPRITE_FOUNDRY_LORA_ROOT:-${ZIMAGE_LORA_ROOT:-${HOME}/LoRA/loras}}"
 SPRITE_FOUNDRY_ZIMAGE_ROOT="${SPRITE_FOUNDRY_ZIMAGE_ROOT:-${ZIMAGE_INSTALL_ROOT:-${HOME}/Z-Image}}"
+SPRITE_FOUNDRY_HF_CACHE_DIR="${SPRITE_FOUNDRY_HF_CACHE_DIR:-${NYMPHS_DATA_ROOT}/cache/huggingface}"
+SPRITE_FOUNDRY_CONTROLNET_PROFILE="sprite_foundry_controlnet_2_1"
+SPRITE_FOUNDRY_CONTROLNET_REPO="${SPRITE_FOUNDRY_CONTROLNET_REPO:-alibaba-pai/Z-Image-Turbo-Fun-Controlnet-Union-2.1}"
+SPRITE_FOUNDRY_CONTROLNET_FILE="${SPRITE_FOUNDRY_CONTROLNET_FILE:-Z-Image-Turbo-Fun-Controlnet-Union-2.1-2602-8steps.safetensors}"
 
 export NYMPHS_DATA_ROOT
 
@@ -115,4 +119,25 @@ from urllib.request import urlopen
 with urlopen(sys.argv[1], timeout=1.5) as response:
     raise SystemExit(0 if 200 <= response.status < 300 else 1)
 PY
+}
+
+sprite_foundry_repo_cache_dir() {
+  local repo_id="$1"
+  local repo_path="${repo_id//\//--}"
+  printf '%s/models--%s\n' "${SPRITE_FOUNDRY_HF_CACHE_DIR}" "${repo_path}"
+}
+
+sprite_foundry_cached_file_path() {
+  local repo_id="$1"
+  local filename="$2"
+  local cache_dir
+  cache_dir="$(sprite_foundry_repo_cache_dir "${repo_id}")"
+  if [[ ! -d "${cache_dir}/snapshots" ]]; then
+    return 1
+  fi
+  find -L "${cache_dir}/snapshots" -mindepth 2 -maxdepth 2 -type f -name "${filename}" -print -quit 2>/dev/null
+}
+
+sprite_foundry_controlnet_ready() {
+  [[ -n "$(sprite_foundry_cached_file_path "${SPRITE_FOUNDRY_CONTROLNET_REPO}" "${SPRITE_FOUNDRY_CONTROLNET_FILE}" || true)" ]]
 }

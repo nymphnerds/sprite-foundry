@@ -3,7 +3,7 @@
   "id": "sprite-foundry",
   "name": "Sprite Foundry",
   "short_name": "SF",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "Foundry-native 8-direction sprite generation, review, lifecycle, and export pipeline for NymphsCore.",
   "category": "image",
   "kind": "sprite-foundry",
@@ -51,6 +51,8 @@
     "foundry_cli": "scripts/sprite_foundry_cli.sh",
     "foundry_status": "scripts/sprite_foundry_foundry_status.sh",
     "foundry_generate": "scripts/sprite_foundry_generate.sh",
+    "fetch_controlnet": "scripts/sprite_foundry_fetch_controlnet.sh",
+    "delete_models": "scripts/sprite_foundry_delete_models.sh",
     "open_outputs": "scripts/sprite_foundry_open_outputs.sh",
     "logs": "scripts/sprite_foundry_logs.sh"
   },
@@ -63,6 +65,8 @@
     "foundry_cli",
     "foundry_status",
     "foundry_generate",
+    "fetch_controlnet",
+    "delete_models",
     "open_outputs",
     "logs"
   ],
@@ -81,78 +85,36 @@
     },
     "manager_action_groups": [
       {
-        "id": "foundry_generation",
-        "title": "Sprite Foundry Run",
+        "id": "model_fetch",
+        "title": "Model Fetch",
         "layout": "compact",
-        "entrypoint": "foundry_generate",
+        "entrypoint": "fetch_controlnet",
         "result": "show_logs",
         "visibility": "installed",
-        "description": "Run the Sprite Foundry pipeline: generation, Foundry registration, mechanical gates, review-ready outputs.",
-        "fields": [
+        "description": "Download the Z-Image ControlNet 2.1 weight required by Sprite Foundry direction control. Sprite Foundry owns this workflow action; Nymphs Image owns the shared cache and fetch implementation.",
+        "links": [
           {
-            "name": "generation_path",
-            "type": "select",
-            "label": "Generation method",
-            "arg": "--generation-path",
-            "default": "nymphscore",
-            "options": [
-              {
-                "label": "NymphsCore / Z-Image",
-                "value": "nymphscore",
-                "description": "Use NymphsCore Z-Image/Nunchaku as the generation backend inside Sprite Foundry."
-              },
-              {
-                "label": "Stack A v2",
-                "value": "stack_a_v2",
-                "description": "Original Sprite Foundry Stack A v2 generation method."
-              },
-              {
-                "label": "Morph ControlNet",
-                "value": "morph",
-                "description": "Original Sprite Foundry morphology-guided generation method."
-              },
-              {
-                "label": "Turnaround Sheet",
-                "value": "turnaround",
-                "description": "Original Sprite Foundry turnaround-sheet generation method."
-              }
-            ]
+            "label": "ControlNet weight",
+            "url": "https://huggingface.co/alibaba-pai/Z-Image-Turbo-Fun-Controlnet-Union-2.1"
           },
           {
-            "name": "config",
-            "type": "text",
-            "label": "Character config",
-            "arg": "--config",
-            "default": "pipeline/chars/goblin_scout.json"
-          },
-          {
-            "name": "sprite_size",
-            "type": "number",
-            "label": "Sprite size",
-            "arg": "--sprite-size",
-            "default": "96"
-          },
-          {
-            "name": "steps",
-            "type": "number",
-            "label": "Steps",
-            "arg": "--steps",
-            "default": "9"
-          },
-          {
-            "name": "seed",
-            "type": "text",
-            "label": "Seed override",
-            "arg": "--seed",
-            "optional": true
+            "label": "Nymphs Image backend",
+            "url": "https://github.com/nymphnerds/zimage"
           }
         ],
         "submit": {
-          "label": "Run Sprite Foundry"
+          "label": "Fetch ControlNet"
         }
       }
     ],
     "manager_actions": [
+      {
+        "id": "open_nymph_ui",
+        "label": "Open UI",
+        "entrypoint": "open_nymph_ui",
+        "result": "open_in_manager",
+        "visibility": "installed"
+      },
       {
         "id": "foundry_status",
         "label": "Foundry Status",

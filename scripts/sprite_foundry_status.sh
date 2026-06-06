@@ -13,6 +13,15 @@ running=false
 state="available"
 health="unavailable"
 detail="${SPRITE_FOUNDRY_MODULE_NAME} is not installed."
+controlnet_ready=false
+weight_profiles_downloaded="none"
+weight_profiles_missing="${SPRITE_FOUNDRY_CONTROLNET_PROFILE}"
+
+if sprite_foundry_controlnet_ready; then
+  controlnet_ready=true
+  weight_profiles_downloaded="${SPRITE_FOUNDRY_CONTROLNET_PROFILE}"
+  weight_profiles_missing="none"
+fi
 
 if [[ -f "${SPRITE_FOUNDRY_MARKER_FILE}" ]]; then
   installed=true
@@ -63,3 +72,11 @@ printf 'install_root=%s\n' "${SPRITE_FOUNDRY_INSTALL_DIR}"
 printf 'outputs_root=%s\n' "${SPRITE_FOUNDRY_OUTPUTS_ROOT}"
 printf 'ui_url=%s\n' "${SPRITE_FOUNDRY_UI_URL}"
 printf 'zimage_url=%s\n' "${SPRITE_FOUNDRY_ZIMAGE_URL}"
+printf 'controlnet_ready=%s\n' "${controlnet_ready}"
+printf 'controlnet_profile=%s\n' "${SPRITE_FOUNDRY_CONTROLNET_PROFILE}"
+printf 'controlnet_weight=%s/%s\n' "${SPRITE_FOUNDRY_CONTROLNET_REPO}" "${SPRITE_FOUNDRY_CONTROLNET_FILE}"
+printf 'weight_profile_selected=%s\n' "${SPRITE_FOUNDRY_CONTROLNET_PROFILE}"
+printf 'weight_profiles_available=%s\n' "${SPRITE_FOUNDRY_CONTROLNET_PROFILE}"
+printf 'weight_profiles_downloaded=%s\n' "${weight_profiles_downloaded}"
+printf 'weight_profiles_missing=%s\n' "${weight_profiles_missing}"
+printf 'weight_profile_ready=%s\n' "${controlnet_ready}"
