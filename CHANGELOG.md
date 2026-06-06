@@ -5,6 +5,46 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/),
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [1.2.0] - 2026-06-06
+
+### Added
+
+- **NymphsCore module identity** — added `nymph.json` with `id: sprite-foundry`,
+  user-facing name `Sprite Foundry`, repo `nymphnerds/sprite-foundry`, install
+  root `$HOME/Sprite-Foundry`, and module-owned Manager actions.
+- **Lifecycle scripts** — added install, update, status, logs, outputs, Foundry
+  status, and Foundry generation entrypoints under `scripts/`.
+- **First-class Foundry generation commands** — exposed the existing generation
+  paths through `foundry.cli`:
+  - `generate-nymphscore`
+  - `generate-stack-a-v2`
+  - `generate-morph`
+  - `generate-turnaround`
+- **Explicit Manager generation control** — added a module action group that
+  chooses one Foundry generation method inside the Sprite Foundry lifecycle
+  instead of the previous confusing source/process split from the abandoned
+  `nymphs-sprite` module.
+- **Nymphs workbench UI** — added a local-url Nymphs UI with generation-method
+  selection, Foundry lifecycle controls, and a full output strip for Foundry
+  artifacts.
+- **Foundry CLI bridge** — added a constrained module action for real Foundry
+  lifecycle commands such as check, review, accept/reject, produce, export,
+  lineage, drift, and metrics.
+- **Standard Manager UI contract** — the module manifest now declares the
+  `local_url` title, start action, and stop action used by the NymphsCore
+  lifecycle rail.
+- **Standard outputs action** — `open_outputs` now returns `directory=...` like
+  the other Nymphs modules.
+
+### Changed
+
+- Reframed the NymphsCore module as **Sprite Foundry**, not Nymphs Sprite.
+- Treats Z-Image/Nunchaku as the NymphsCore backend path for Foundry generation,
+  not as the user-facing workflow.
+- The NymphsCore generation path now directs Z-Image backend output into a
+  Sprite-Foundry-owned run folder and moves it into `bakeoff/<run_id>/`, avoiding
+  duplicate visible Z-Image batches.
+
 ## [1.1.0] - 2026-03-27
 
 ### Added

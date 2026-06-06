@@ -16,7 +16,9 @@
 ### Default safety posture
 
 - [x] `[cli|mcp|desktop]` File operations constrained to known directories (2026-03-26)
-- [ ] `[cli|mcp|desktop]` SKIP: No dangerous actions — foundry is a read/generate/export tool, no kill/delete/restart operations
+- [x] `[cli|mcp|desktop]` Destructive actions are constrained to known directories
+  (2026-06-06) — the Nymphs UI can stop its own UI server and delete/move only
+  managed output records under Sprite Foundry output roots.
 - [ ] `[mcp]` SKIP: not an MCP server
 - [ ] `[mcp]` SKIP: not an MCP server
 

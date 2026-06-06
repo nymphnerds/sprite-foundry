@@ -234,6 +234,7 @@ def build_payload(
     *,
     args: argparse.Namespace,
     batch_id: str,
+    backend_dir: Path,
     direction_name: str,
     direction_prompt: str,
     index: int,
@@ -271,6 +272,7 @@ def build_payload(
         "item_label": direction_name,
         "item_index": index,
         "item_total": direction_count,
+        "output_dir": str(backend_dir),
     }
 
 
@@ -292,7 +294,9 @@ def generate_and_register(config: dict[str, Any], args: argparse.Namespace) -> s
     ts = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S")
     run_id = f"{subject_id}_nymphscore_{ts}"
     out_dir = FOUNDRY_ROOT / "bakeoff" / run_id
+    backend_dir = Path.home() / "NymphsData" / "outputs" / "sprite-foundry" / run_id / "backend"
     out_dir.mkdir(parents=True, exist_ok=True)
+    backend_dir.mkdir(parents=True, exist_ok=True)
 
     print(f"\n{'=' * 60}")
     print(f"NYMPHSCORE GENERATION: {display_name}")
@@ -313,6 +317,7 @@ def generate_and_register(config: dict[str, Any], args: argparse.Namespace) -> s
         payload = build_payload(
             args=args,
             batch_id=run_id,
+            backend_dir=backend_dir,
             direction_name=direction_name,
             direction_prompt=direction_prompt,
             index=index,
@@ -331,7 +336,18 @@ def generate_and_register(config: dict[str, Any], args: argparse.Namespace) -> s
             continue
 
         raw_path = out_dir / f"{direction_name}_raw.png"
-        shutil.copy2(source, raw_path)
+        source_metadata = source.with_suffix(".json")
+        shutil.move(str(source), str(raw_path))
+        if source_metadata.is_file():
+            shutil.move(str(source_metadata), str(raw_path.with_suffix(".json")))
+        try:
+            source.parent.rmdir()
+        except OSError:
+            pass
+        try:
+            source.parent.parent.rmdir()
+        except OSError:
+            pass
         with Image.open(raw_path) as handle:
             raw_img = handle.convert("RGBA")
         pixel_img = pixelate(

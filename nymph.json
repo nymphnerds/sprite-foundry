@@ -1,0 +1,199 @@
+{
+  "manifest_version": 1,
+  "id": "sprite-foundry",
+  "name": "Sprite Foundry",
+  "short_name": "SF",
+  "version": "1.2.0",
+  "description": "Foundry-native 8-direction sprite generation, review, lifecycle, and export pipeline for NymphsCore.",
+  "category": "image",
+  "kind": "sprite-foundry",
+  "packaging": "repo",
+  "repo": {
+    "url": "https://github.com/nymphnerds/sprite-foundry.git",
+    "branch": "main"
+  },
+  "source": {
+    "type": "repo",
+    "repo": "https://github.com/nymphnerds/sprite-foundry.git",
+    "ref": "main"
+  },
+  "install": {
+    "root": "$HOME/Sprite-Foundry",
+    "entrypoint": "scripts/install_sprite_foundry.sh",
+    "version_marker": "$HOME/Sprite-Foundry/.nymph-module-version",
+    "installed_markers": [
+      "$HOME/Sprite-Foundry/.nymph-module-version"
+    ]
+  },
+  "runtime": {
+    "host": "127.0.0.1",
+    "port": 7001,
+    "health_url": "http://127.0.0.1:7001/health",
+    "server_info_url": "http://127.0.0.1:7001/server_info",
+    "frontend_url": "http://127.0.0.1:7001/nymph"
+  },
+  "artifacts": {
+    "outputs_root": "$HOME/NymphsData/outputs/sprite-foundry",
+    "config_root": "$HOME/NymphsData/config/sprite-foundry",
+    "logs_root": "$HOME/NymphsData/logs/sprite-foundry",
+    "foundry_bakeoff_root": "$HOME/Sprite-Foundry/bakeoff",
+    "foundry_exports_root": "$HOME/Sprite-Foundry/exports",
+    "lora_root": "$HOME/LoRA/loras",
+    "zimage_url": "http://127.0.0.1:8090"
+  },
+  "entrypoints": {
+    "install": "scripts/install_sprite_foundry.sh",
+    "update": "scripts/sprite_foundry_update.sh",
+    "status": "scripts/sprite_foundry_status.sh",
+    "open_nymph_ui": "scripts/sprite_foundry_open_ui.sh",
+    "stop": "scripts/sprite_foundry_stop_ui.sh",
+    "stop_ui": "scripts/sprite_foundry_stop_ui.sh",
+    "foundry_cli": "scripts/sprite_foundry_cli.sh",
+    "foundry_status": "scripts/sprite_foundry_foundry_status.sh",
+    "foundry_generate": "scripts/sprite_foundry_generate.sh",
+    "open_outputs": "scripts/sprite_foundry_open_outputs.sh",
+    "logs": "scripts/sprite_foundry_logs.sh"
+  },
+  "capabilities": [
+    "install",
+    "status",
+    "open_nymph_ui",
+    "stop",
+    "stop_ui",
+    "foundry_cli",
+    "foundry_status",
+    "foundry_generate",
+    "open_outputs",
+    "logs"
+  ],
+  "ui": {
+    "sort_order": 25,
+    "standard_lifecycle_rail": true,
+    "manager_ui": {
+      "type": "local_url",
+      "title": "Sprite Foundry",
+      "entrypoint": "open_nymph_ui",
+      "url": "http://127.0.0.1:7001/nymph",
+      "health_url": "http://127.0.0.1:7001/health",
+      "requires_running": true,
+      "start_action": "open_nymph_ui",
+      "stop_action": "stop"
+    },
+    "manager_action_groups": [
+      {
+        "id": "foundry_generation",
+        "title": "Sprite Foundry Run",
+        "layout": "compact",
+        "entrypoint": "foundry_generate",
+        "result": "show_logs",
+        "visibility": "installed",
+        "description": "Run the Sprite Foundry pipeline: generation, Foundry registration, mechanical gates, review-ready outputs.",
+        "fields": [
+          {
+            "name": "generation_path",
+            "type": "select",
+            "label": "Generation method",
+            "arg": "--generation-path",
+            "default": "nymphscore",
+            "options": [
+              {
+                "label": "NymphsCore / Z-Image",
+                "value": "nymphscore",
+                "description": "Use NymphsCore Z-Image/Nunchaku as the generation backend inside Sprite Foundry."
+              },
+              {
+                "label": "Stack A v2",
+                "value": "stack_a_v2",
+                "description": "Original Sprite Foundry Stack A v2 generation method."
+              },
+              {
+                "label": "Morph ControlNet",
+                "value": "morph",
+                "description": "Original Sprite Foundry morphology-guided generation method."
+              },
+              {
+                "label": "Turnaround Sheet",
+                "value": "turnaround",
+                "description": "Original Sprite Foundry turnaround-sheet generation method."
+              }
+            ]
+          },
+          {
+            "name": "config",
+            "type": "text",
+            "label": "Character config",
+            "arg": "--config",
+            "default": "pipeline/chars/goblin_scout.json"
+          },
+          {
+            "name": "sprite_size",
+            "type": "number",
+            "label": "Sprite size",
+            "arg": "--sprite-size",
+            "default": "96"
+          },
+          {
+            "name": "steps",
+            "type": "number",
+            "label": "Steps",
+            "arg": "--steps",
+            "default": "9"
+          },
+          {
+            "name": "seed",
+            "type": "text",
+            "label": "Seed override",
+            "arg": "--seed",
+            "optional": true
+          }
+        ],
+        "submit": {
+          "label": "Run Sprite Foundry"
+        }
+      }
+    ],
+    "manager_actions": [
+      {
+        "id": "foundry_status",
+        "label": "Foundry Status",
+        "entrypoint": "foundry_status",
+        "result": "show_output",
+        "visibility": "installed"
+      },
+      {
+        "id": "foundry_cli",
+        "label": "Foundry Command",
+        "entrypoint": "foundry_cli",
+        "result": "show_output",
+        "visibility": "installed"
+      },
+      {
+        "id": "open_outputs",
+        "label": "Open Outputs",
+        "entrypoint": "open_outputs",
+        "result": "show_output",
+        "visibility": "installed"
+      },
+      {
+        "id": "logs",
+        "label": "Logs",
+        "entrypoint": "logs",
+        "result": "show_logs",
+        "visibility": "installed"
+      }
+    ]
+  },
+  "requirements": {
+    "wsl": true,
+    "python": ">=3.11",
+    "gpu": "NVIDIA CUDA recommended",
+    "dependencies": [
+      "Z-Image module for NymphsCore generation backend",
+      "Nunchaku runtime for accelerated Z-Image generation",
+      "A Z-Image-compatible sprite/pixel-art LoRA"
+    ]
+  },
+  "notes": {
+    "workflow": "Sprite Foundry owns the Foundry run/review/export lifecycle. Z-Image is a backend, not the user-facing workflow."
+  }
+}

@@ -2013,6 +2013,86 @@ def cmd_generate_nymphscore(args):
     foundry_gen_nymphscore.generate_and_register(config, args)
 
 
+# -- foundry generate-stack-a-v2 ------------------------------
+
+def cmd_generate_stack_a_v2(args):
+    """Generate the original Stack A v2 8-direction Foundry run."""
+    from pipeline import foundry_gen
+
+    config_path = Path(args.config)
+    if not config_path.exists():
+        print(f"Config not found: {config_path}")
+        sys.exit(1)
+    with open(config_path, encoding="utf-8") as f:
+        config = json.load(f)
+    foundry_gen.generate_and_register(config)
+
+
+# -- foundry generate-morph -----------------------------------
+
+def cmd_generate_morph(args):
+    """Generate a morphology/ControlNet-guided Foundry run."""
+    from pipeline import foundry_gen_morph
+
+    config_path = Path(args.config)
+    if not config_path.exists():
+        print(f"Config not found: {config_path}")
+        sys.exit(1)
+    with open(config_path, encoding="utf-8") as f:
+        config = json.load(f)
+
+    bc_depth, bc_strength, bc_end, bc_edge, bc_edge_strength, bc_edge_end = (
+        foundry_gen_morph.resolve_body_class(config, args.body_class, args.depth_refs)
+    )
+
+    depth_dir = Path(args.depth_refs) if args.depth_refs else bc_depth
+    if depth_dir is None:
+        print("ERROR: No depth refs specified. Use --depth-refs, --body-class, or add body_class to config JSON.")
+        sys.exit(1)
+    if not depth_dir.exists():
+        print(f"Depth refs directory not found: {depth_dir}")
+        sys.exit(1)
+
+    edge_dir = None
+    if args.edge_refs:
+        edge_dir = Path(args.edge_refs)
+    elif bc_edge:
+        edge_dir = bc_edge
+    if edge_dir and not edge_dir.exists():
+        print(f"Edge refs directory not found: {edge_dir}")
+        sys.exit(1)
+
+    strength = args.strength if args.strength is not None else (bc_strength or foundry_gen_morph.CONTROLNET_STRENGTH)
+    end_percent = args.end_percent if args.end_percent is not None else (bc_end or 0.8)
+    edge_strength = args.edge_strength if args.edge_refs else (bc_edge_strength or 0.45)
+    edge_end_percent = args.edge_end_percent if args.edge_refs else (bc_edge_end or 0.85)
+
+    foundry_gen_morph.generate_morph(
+        config,
+        depth_dir,
+        cn_strength=strength,
+        cn_end_percent=end_percent,
+        edge_refs_dir=edge_dir,
+        edge_strength=edge_strength,
+        edge_end_percent=edge_end_percent,
+    )
+
+
+# -- foundry generate-turnaround ------------------------------
+
+def cmd_generate_turnaround(args):
+    """Generate one turnaround sheet and crop views from it."""
+    from pipeline import foundry_gen_turnaround
+
+    config_path = Path(args.config)
+    if not config_path.exists():
+        print(f"Config not found: {config_path}")
+        sys.exit(1)
+    with open(config_path, encoding="utf-8") as f:
+        config = json.load(f)
+    foundry_gen_turnaround.generate_turnaround(config)
+
+
 # -- CLI argument parser --------------------------------------
 
 def build_parser() -> argparse.ArgumentParser:
@@ -2076,6 +2156,25 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--green-screen", dest="no_green_screen", action="store_false", default=False)
     p.add_argument("--no-green-screen", dest="no_green_screen", action="store_true")
     p.add_argument("--no-check", action="store_true", help="Skip immediate Foundry mechanical gates")
+
+    # generate-stack-a-v2
+    p = sub.add_parser("generate-stack-a-v2", help="Generate the original Stack A v2 8-direction Foundry run")
+    p.add_argument("--config", required=True, help="Path to character config JSON")
+
+    # generate-morph
+    p = sub.add_parser("generate-morph", help="Generate a morphology/ControlNet-guided Foundry run")
+    p.add_argument("--config", required=True, help="Path to character config JSON")
+    p.add_argument("--depth-refs", default=None, help="Directory with per-direction depth reference images")
+    p.add_argument("--body-class", default=None, help="Body class preset from foundry_gen_morph")
+    p.add_argument("--strength", type=float, default=None, help="Depth ControlNet strength")
+    p.add_argument("--end-percent", type=float, default=None, help="Depth ControlNet end percent")
+    p.add_argument("--edge-refs", default=None, help="Directory with per-direction Canny edge reference images")
+    p.add_argument("--edge-strength", type=float, default=0.45, help="Edge ControlNet strength")
+    p.add_argument("--edge-end-percent", type=float, default=0.85, help="Edge ControlNet end percent")
+
+    # generate-turnaround
+    p = sub.add_parser("generate-turnaround", help="Generate one turnaround sheet and crop views from it")
+    p.add_argument("--config", required=True, help="Path to character config JSON")
 
     # check
     p = sub.add_parser("check", help="Run mechanical gates on a run")
@@ -2189,6 +2288,9 @@ def main():
         "register-run": cmd_register_run,
         "register-attempt": cmd_register_attempt,
         "generate-nymphscore": cmd_generate_nymphscore,
+        "generate-stack-a-v2": cmd_generate_stack_a_v2,
+        "generate-morph": cmd_generate_morph,
+        "generate-turnaround": cmd_generate_turnaround,
         "check": cmd_check,
         "review-show": cmd_review_show,
         "review-accept": cmd_review_accept,
