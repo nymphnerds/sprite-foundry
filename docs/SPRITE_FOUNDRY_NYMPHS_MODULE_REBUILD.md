@@ -136,16 +136,18 @@ run one Sprite Foundry generation
 
 ## 2026-06-06 Sprite-Owned Fetch Pass
 
-Version `1.2.4` moves the visible asset preparation workflow back under Sprite
+Version `1.2.5` moves the visible asset preparation workflow back under Sprite
 Foundry:
 
 - Sprite Foundry Details now exposes a `Model Fetch` dropdown for the starter
   stack, ControlNet, all bundled LoRAs, and individual pixel-art LoRAs.
 - LoRAs fetched from Sprite Foundry are written to the shared LoRA folder used
-  by the LoRA module and Z-Image:
+  by the LoRA module and Z-Image, preserving their Hugging Face repo/file names:
 
 ```text
-$HOME/LoRA/loras
+$HOME/LoRA/loras/mks0813--z-image-turbo-pixel-art-lora/z-image-turbo-pixel-art-lora.safetensors
+$HOME/LoRA/loras/SkyAsl--Pixel-artist-Z/adapter_model.safetensors
+$HOME/LoRA/loras/tarn59--pixel_art_style_lora_z_image_turbo/pixel_art_style_z_image_turbo.safetensors
 ```
 
 - Z-Image backend weights and ControlNet still use the shared Nymphs Hugging
@@ -153,6 +155,12 @@ $HOME/LoRA/loras
   backend fetch implementation for Z-Image weights.
 - Sprite Foundry status reports those shared LoRA files as Sprite Foundry cache
   profiles so the Manager Details page can show them as downloaded.
+- The workbench LoRA dropdown is driven by real `.safetensors` files in
+  `$HOME/LoRA/loras`; custom user LoRAs are shown by their actual folder/file
+  name.
+- Sprite Foundry LoRA fetch emits the standard compact NymphsCore model-fetch
+  progress lines: `MODEL FETCH STARTED`, repeated `MODEL FETCH STATUS`, and
+  `MODEL FETCH COMPLETE`.
 - Cache deletion is scoped to known Sprite Foundry LoRA filenames and the
   ControlNet weight. It does not touch user-trained LoRAs, datasets, jobs,
   outputs, logs, or runtime files.

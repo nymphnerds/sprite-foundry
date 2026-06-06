@@ -939,35 +939,16 @@
       }).filter((item) => item.id && item.path);
     }
 
-    const loraMetadata = {
-      mks0813_pixel_art: { label: "Z-Image Turbo Pixel LoRA", trigger: "pxlstl" },
-      skyasl_pixel_artist: { label: "Pixel-artist-Z Character LoRA", trigger: "a pixel art character" },
-      tarn59_pixel_art: { label: "Pixel Art Style LoRA", trigger: "Pixel art style." }
-    };
-
-    function canonicalLoraId(id, path = "") {
-      const text = `${id || ""} ${path || ""}`.toLowerCase();
-      if (text.includes("mks0813")) return "mks0813_pixel_art";
-      if (text.includes("skyasl") || text.includes("pixel_artist")) return "skyasl_pixel_artist";
-      if (text.includes("tarn59") || text.includes("pixel_art_style")) return "tarn59_pixel_art";
-      return id || "";
-    }
-
     function loraLabel(choice) {
-      const canonical = canonicalLoraId(choice.id, choice.path);
-      if (loraMetadata[canonical]) return loraMetadata[canonical].label;
-      return String(choice.id || choice.name || "LoRA").replace(/^custom_/, "").replace(/_/g, " ");
+      return String(choice.name || choice.id || "LoRA");
     }
 
     function loraTriggerFor(id, path = "") {
-      const canonical = canonicalLoraId(id, path);
-      return loraMetadata[canonical]?.trigger || "";
-    }
-
-    function loraAvailableIds(values) {
-      const available = list(values.weight_profiles_available).filter((id) => loraMetadata[canonicalLoraId(id)]);
-      if (available.length) return available;
-      return Object.keys(loraMetadata);
+      const text = `${id || ""} ${path || ""}`.toLowerCase();
+      if (text.includes("mks0813")) return "pxlstl";
+      if (text.includes("skyasl") || text.includes("pixel_artist") || text.includes("pixel-artist-z")) return "a pixel art character";
+      if (text.includes("tarn59") || text.includes("pixel_art_style")) return "Pixel art style.";
+      return "";
     }
 
     function yes(value) {
@@ -993,36 +974,22 @@
     function populateLoraChoices(values) {
       const select = $("lora-choice");
       const choices = loraChoices(values.lora_choices);
-      const choiceByCanonical = new Map(choices.map((choice) => [canonicalLoraId(choice.id, choice.path), choice]));
-      const selectedId = values.selected_lora_candidate || values.weight_profile_selected || "";
+      const selectedId = values.selected_lora_candidate || "";
       state.selectedLoraPath = values.selected_lora_path || "";
       select.innerHTML = "";
-      if (!choices.length && !loraAvailableIds(values).length) {
+      if (!choices.length) {
         const option = document.createElement("option");
         option.value = "";
-        option.textContent = "No sprite LoRA downloaded";
+        option.textContent = "No LoRAs found";
         select.appendChild(option);
         select.disabled = true;
         return;
       }
       select.disabled = false;
-      for (const candidateId of loraAvailableIds(values)) {
-        const choice = choiceByCanonical.get(candidateId);
-        const option = document.createElement("option");
-        option.value = choice?.id || candidateId;
-        option.dataset.path = choice?.path || "";
-        option.dataset.canonicalId = candidateId;
-        option.textContent = choice ? loraLabel(choice) : `${loraMetadata[candidateId]?.label || candidateId} / missing`;
-        option.disabled = !choice;
-        select.appendChild(option);
-      }
       for (const choice of choices) {
-        const canonicalId = canonicalLoraId(choice.id, choice.path);
-        if (loraMetadata[canonicalId]) continue;
         const option = document.createElement("option");
         option.value = choice.id;
         option.dataset.path = choice.path;
-        option.dataset.canonicalId = canonicalId;
         option.textContent = loraLabel(choice);
         select.appendChild(option);
       }
@@ -1041,8 +1008,7 @@
       const values = parseKeyValues(text);
       state.statusValues = values;
       const loras = list(values.downloaded_loras);
-      const spriteLoraTotal = loraAvailableIds(values).length;
-      const spriteLoraDownloaded = list(values.weight_profiles_downloaded).filter((id) => loraMetadata[canonicalLoraId(id)]).length || loras.filter((id) => loraMetadata[canonicalLoraId(id)]).length;
+      const spriteLoraDownloaded = loraChoices(values.lora_choices).length;
       const zReady = yes(values.zimage_models_ready);
       const zRunning = yes(values.zimage_running);
       const controlReady = yes(values.controlnet_ready);
@@ -1054,7 +1020,7 @@
       $("model-chip").textContent = zModelChipText();
       $("runtime-text").textContent = values.zimage_url ? `Backend ${values.zimage_url} / ${zRunning ? "running" : "not running"} / ${zReady ? "models ready" : "fetch models"}` : "Backend";
       $("selected-model-text").textContent = values.selected_lora_path ? basename(values.selected_lora_path) : (loras.join(", ") || "none");
-      $("progress-detail").textContent = `Backend ${zRunning && zReady ? "ready" : "not ready"} | ControlNet ${controlReady ? "ready" : "missing"} | LoRA ${spriteLoraDownloaded}/${spriteLoraTotal}`;
+      $("progress-detail").textContent = `Backend ${zRunning && zReady ? "ready" : "not ready"} | ControlNet ${controlReady ? "ready" : "missing"} | LoRA ${spriteLoraDownloaded} found`;
       populateLoraChoices(values);
       if (values.selected_lora_trigger) $("lora-trigger").value = values.selected_lora_trigger;
       if (values.selected_lora_scale) $("lora-scale").value = values.selected_lora_scale;

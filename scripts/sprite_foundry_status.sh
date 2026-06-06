@@ -53,22 +53,19 @@ from pathlib import Path
 
 lora_root = Path(sys.argv[1]).expanduser()
 candidates = {
-    "mks0813_pixel_art": {
-        "filename": "mks0813_pixel_art.safetensors",
-        "repo_dir": "mks0813--z-image-turbo-pixel-lora",
-        "repo_file": "epoch-1.safetensors",
+    "mks0813--z-image-turbo-pixel-art-lora": {
+        "repo_dir": "mks0813--z-image-turbo-pixel-art-lora",
+        "repo_file": "z-image-turbo-pixel-art-lora.safetensors",
         "trigger": "pxlstl",
         "scale": "1",
     },
-    "skyasl_pixel_artist": {
-        "filename": "skyasl_pixel_artist.safetensors",
+    "SkyAsl--Pixel-artist-Z": {
         "repo_dir": "SkyAsl--Pixel-artist-Z",
         "repo_file": "adapter_model.safetensors",
         "trigger": "a pixel art character",
         "scale": "1",
     },
-    "tarn59_pixel_art": {
-        "filename": "tarn59_pixel_art.safetensors",
+    "tarn59--pixel_art_style_lora_z_image_turbo": {
         "repo_dir": "tarn59--pixel_art_style_lora_z_image_turbo",
         "repo_file": "pixel_art_style_z_image_turbo.safetensors",
         "trigger": "Pixel art style.",
@@ -82,13 +79,13 @@ def emit(key: str, value: str) -> None:
 def clean(value: str) -> str:
     return re.sub(r"[^A-Za-z0-9_.:-]+", "_", value).strip("_") or "unknown"
 
+def choice_name(path: Path) -> str:
+    if path.parent != lora_root:
+        return path.parent.name
+    return path.name
+
 def candidate_paths(candidate: dict[str, str]) -> list[Path]:
-    filename = candidate["filename"]
-    return [
-        lora_root / Path(filename).stem / filename,
-        lora_root / filename,
-        lora_root / candidate["repo_dir"] / candidate["repo_file"],
-    ]
+    return [lora_root / candidate["repo_dir"] / candidate["repo_file"]]
 
 downloaded: list[str] = []
 choices: list[str] = []
@@ -107,7 +104,7 @@ for candidate_id, item in candidates.items():
     if found:
         resolved = found.resolve()
         downloaded.append(candidate_id)
-        choices.append(f"{candidate_id}|{resolved.name}|{resolved}")
+        choices.append(f"{candidate_id}|{candidate_id}|{resolved}")
         seen.add(resolved)
         if not selected_path:
             selected_id = candidate_id
@@ -120,9 +117,10 @@ if lora_root.is_dir():
         resolved = path.resolve()
         if resolved in seen:
             continue
-        candidate_id = f"custom_{clean(path.stem)}"
-        downloaded.append(candidate_id)
-        choices.append(f"{candidate_id}|{resolved.name}|{resolved}")
+        display_name = choice_name(path)
+        candidate_id = clean(display_name)
+        downloaded.append(display_name)
+        choices.append(f"{candidate_id}|{display_name}|{resolved}")
         if not selected_path:
             selected_id = candidate_id
             selected_path = str(resolved)
@@ -155,15 +153,15 @@ else
   missing_fetch_profiles+=("${SPRITE_FOUNDRY_CONTROLNET_PROFILE}")
 fi
 case ",${downloaded_loras}," in
-  *,mks0813_pixel_art,*) downloaded_fetch_profiles+=(sprite_foundry_lora_mks0813_pixel_art) ;;
+  *,mks0813--z-image-turbo-pixel-art-lora,*) downloaded_fetch_profiles+=(sprite_foundry_lora_mks0813_pixel_art) ;;
   *) missing_fetch_profiles+=(sprite_foundry_lora_mks0813_pixel_art) ;;
 esac
 case ",${downloaded_loras}," in
-  *,skyasl_pixel_artist,*) downloaded_fetch_profiles+=(sprite_foundry_lora_skyasl_pixel_artist) ;;
+  *,SkyAsl--Pixel-artist-Z,*) downloaded_fetch_profiles+=(sprite_foundry_lora_skyasl_pixel_artist) ;;
   *) missing_fetch_profiles+=(sprite_foundry_lora_skyasl_pixel_artist) ;;
 esac
 case ",${downloaded_loras}," in
-  *,tarn59_pixel_art,*) downloaded_fetch_profiles+=(sprite_foundry_lora_tarn59_pixel_art) ;;
+  *,tarn59--pixel_art_style_lora_z_image_turbo,*) downloaded_fetch_profiles+=(sprite_foundry_lora_tarn59_pixel_art) ;;
   *) missing_fetch_profiles+=(sprite_foundry_lora_tarn59_pixel_art) ;;
 esac
 if [[ ${#downloaded_fetch_profiles[@]} -gt 0 ]]; then

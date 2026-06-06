@@ -5,6 +5,25 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/),
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [1.2.5] - 2026-06-06
+
+### Fixed
+
+- Sprite Foundry LoRA fetch now preserves Hugging Face repo/file identity in
+  the shared LoRA folder instead of renaming downloaded LoRAs. The three bundled
+  pixel-art LoRAs are written as:
+  - `$HOME/LoRA/loras/mks0813--z-image-turbo-pixel-art-lora/z-image-turbo-pixel-art-lora.safetensors`
+  - `$HOME/LoRA/loras/SkyAsl--Pixel-artist-Z/adapter_model.safetensors`
+  - `$HOME/LoRA/loras/tarn59--pixel_art_style_lora_z_image_turbo/pixel_art_style_z_image_turbo.safetensors`
+- Sprite Foundry status and UI LoRA choices now show those actual downloaded
+  LoRA names rather than friendly replacement labels. Custom user LoRAs in
+  `$HOME/LoRA/loras` are also shown by their real folder/file name.
+- Sprite Foundry LoRA downloads now emit the standard compact NymphsCore
+  `MODEL FETCH STARTED/STATUS/COMPLETE` progress lines instead of raw path-only
+  output.
+- `delete_models` now deletes the corrected HF-shaped LoRA files and also
+  cleans up the exact old renamed Sprite Foundry LoRA paths if present.
+
 ## [1.2.4] - 2026-06-06
 
 ### Changed

@@ -35,6 +35,110 @@ done
 fetch_script="$(sprite_foundry_zimage_script zimage_fetch_models.sh 2>/dev/null || true)"
 python_bin="$(sprite_foundry_python_bin)"
 
+format_bytes() {
+  local bytes="${1:-0}"
+  python3 - "${bytes}" <<'PY'
+import sys
+
+try:
+    value = float(sys.argv[1])
+except Exception:
+    value = 0.0
+
+for unit in ("B", "KiB", "MiB", "GiB", "TiB"):
+    if value < 1024 or unit == "TiB":
+        print(f"{value:.2f} {unit}" if unit != "B" else f"{int(value)} B")
+        break
+    value /= 1024
+PY
+}
+
+cache_size_bytes() {
+  local path="$1"
+  if [[ ! -d "${path}" ]]; then
+    echo 0
+    return
+  fi
+  du -sb "${path}" 2>/dev/null | awk '{print $1}'
+}
+
+hf_repo_cache_dir() {
+  local repo_id="$1"
+  printf '%s/models--%s\n' "${SPRITE_FOUNDRY_HF_CACHE_DIR}" "${repo_id//\//--}"
+}
+
+hf_repo_blob_bytes() {
+  local repo_id="$1"
+  local repo_dir
+  repo_dir="$(hf_repo_cache_dir "${repo_id}")"
+  cache_size_bytes "${repo_dir}/blobs"
+}
+
+hf_repo_active_download_count() {
+  local repo_id="$1"
+  local repo_dir
+  repo_dir="$(hf_repo_cache_dir "${repo_id}")"
+  if [[ ! -d "${repo_dir}" ]]; then
+    echo 0
+    return
+  fi
+  find "${repo_dir}" -type f \( -name '*.incomplete' -o -name '*.lock' \) 2>/dev/null | wc -l | tr -d ' '
+}
+
+print_hf_download_progress() {
+  local label="$1"
+  local repo_id="$2"
+  local repo_bytes
+  local active_count
+  repo_bytes="$(hf_repo_blob_bytes "${repo_id}")"
+  active_count="$(hf_repo_active_download_count "${repo_id}")"
+  echo "MODEL FETCH STATUS: step=${label} repo=${repo_id} status=downloading this_repo_cache=$(format_bytes "${repo_bytes}") active_download_files=${active_count}"
+}
+
+run_with_hf_download_progress() {
+  local label="$1"
+  local repo_id="$2"
+  shift 2
+
+  local interval="${SPRITE_FOUNDRY_FETCH_PROGRESS_INTERVAL:-5}"
+  local marker
+  local pid
+  local status
+  if [[ ! "${interval}" =~ ^[0-9]+$ || "${interval}" -lt 1 ]]; then
+    interval=5
+  fi
+
+  marker="$(mktemp "${TMPDIR:-/tmp}/sprite-foundry-fetch.XXXXXX.status")"
+  rm -f "${marker}"
+
+  echo "MODEL FETCH STARTED: step=${label} repo=${repo_id}"
+  print_hf_download_progress "${label}" "${repo_id}"
+  (
+    set +e
+    "$@"
+    printf '%s\n' "$?" > "${marker}"
+  ) &
+  pid=$!
+
+  while [[ ! -f "${marker}" ]]; do
+    sleep "${interval}"
+    [[ -f "${marker}" ]] && break
+    print_hf_download_progress "${label}" "${repo_id}"
+  done
+
+  wait "${pid}" || true
+  status="$(cat "${marker}" 2>/dev/null || echo 1)"
+  rm -f "${marker}"
+
+  if [[ "${status}" -eq 0 ]]; then
+    print_hf_download_progress "${label}" "${repo_id}"
+    echo "MODEL FETCH COMPLETE: step=${label} repo=${repo_id}"
+  else
+    echo "MODEL FETCH FAILED: step=${label} repo=${repo_id} exit_status=${status}"
+  fi
+  return "${status}"
+}
+
 fetch_zimage_profile() {
   local model="$1"
   if [[ -z "${fetch_script}" ]]; then
@@ -52,15 +156,12 @@ fetch_lora() {
   local profile="$1"
   local repo_id="$2"
   local repo_file="$3"
-  local library_id="$4"
-  local library_file="$5"
+  local library_dir="${repo_id//\//--}"
 
   sprite_foundry_ensure_dirs
-  echo "Sprite Foundry LoRA fetch"
-  echo "model=${profile}"
-  echo "repo=${repo_id}"
-  echo "target=${SPRITE_FOUNDRY_LORA_ROOT}/${library_id}/${library_file}"
-  "${python_bin}" - "${repo_id}" "${repo_file}" "${SPRITE_FOUNDRY_HF_CACHE_DIR}" "${SPRITE_FOUNDRY_LORA_ROOT}" "${library_id}" "${library_file}" <<'PY'
+  echo "model_fetch_plan=Sprite Foundry LoRA ${profile}"
+  download_lora() {
+    "${python_bin}" - "${repo_id}" "${repo_file}" "${SPRITE_FOUNDRY_HF_CACHE_DIR}" "${SPRITE_FOUNDRY_LORA_ROOT}" "${library_dir}" <<'PY'
 from __future__ import annotations
 
 import os
@@ -73,43 +174,39 @@ try:
 except Exception as exc:
     raise SystemExit(f"ERROR: huggingface_hub is required to fetch Sprite Foundry LoRAs: {exc}")
 
-repo_id, repo_file, cache_dir, lora_root, library_id, library_file = sys.argv[1:7]
+repo_id, repo_file, cache_dir, lora_root, library_dir = sys.argv[1:6]
 token = os.getenv("NYMPHS3D_HF_TOKEN") or os.getenv("HF_TOKEN") or None
 downloaded = Path(hf_hub_download(repo_id=repo_id, filename=repo_file, cache_dir=cache_dir, token=token))
-target_dir = Path(lora_root).expanduser() / library_id
+target_dir = Path(lora_root).expanduser() / library_dir
 target_dir.mkdir(parents=True, exist_ok=True)
-target = target_dir / library_file
+target = target_dir / repo_file
 if downloaded.resolve() != target.resolve():
     shutil.copy2(downloaded, target)
-print(f"LoRA ready: {target}", flush=True)
+print(f"MODEL FETCH COMPLETE: lora_path={target}", flush=True)
 PY
+  }
+  run_with_hf_download_progress "Sprite Foundry LoRA" "${repo_id}" download_lora
 }
 
 fetch_mks0813() {
   fetch_lora \
     "sprite_foundry_lora_mks0813_pixel_art" \
-    "mks0813/z-image-turbo-pixel-lora" \
-    "epoch-1.safetensors" \
-    "mks0813_pixel_art" \
-    "mks0813_pixel_art.safetensors"
+    "mks0813/z-image-turbo-pixel-art-lora" \
+    "z-image-turbo-pixel-art-lora.safetensors"
 }
 
 fetch_skyasl() {
   fetch_lora \
     "sprite_foundry_lora_skyasl_pixel_artist" \
     "SkyAsl/Pixel-artist-Z" \
-    "adapter_model.safetensors" \
-    "skyasl_pixel_artist" \
-    "skyasl_pixel_artist.safetensors"
+    "adapter_model.safetensors"
 }
 
 fetch_tarn59() {
   fetch_lora \
     "sprite_foundry_lora_tarn59_pixel_art" \
     "tarn59/pixel_art_style_lora_z_image_turbo" \
-    "pixel_art_style_z_image_turbo.safetensors" \
-    "tarn59_pixel_art" \
-    "tarn59_pixel_art.safetensors"
+    "pixel_art_style_z_image_turbo.safetensors"
 }
 
 case "${selected_model}" in

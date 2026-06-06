@@ -3,7 +3,7 @@
   "id": "sprite-foundry",
   "name": "Sprite Foundry",
   "short_name": "SF",
-  "version": "1.2.4",
+  "version": "1.2.5",
   "description": "Foundry-native 8-direction sprite generation, review, lifecycle, and export pipeline for NymphsCore.",
   "category": "image",
   "kind": "sprite-foundry",
@@ -113,7 +113,7 @@
               {
                 "label": "Complete Sprite Foundry Starter Stack",
                 "value": "sprite_foundry_starter_stack",
-                "description": "Fetch Z-Image INT4 r32, ControlNet 2.1, and the recommended Z-Image Turbo Pixel LoRA"
+                "description": "Fetch Z-Image INT4 r32, ControlNet 2.1, and mks0813/z-image-turbo-pixel-art-lora"
               },
               {
                 "label": "Z-Image ControlNet 2.1",
@@ -126,17 +126,17 @@
                 "description": "Fetch all bundled Z-Image pixel-art LoRA choices into the shared LoRA folder"
               },
               {
-                "label": "Z-Image Turbo Pixel LoRA",
+                "label": "mks0813/z-image-turbo-pixel-art-lora",
                 "value": "sprite_foundry_lora_mks0813_pixel_art",
                 "description": "Recommended first Sprite Foundry LoRA; trigger: pxlstl"
               },
               {
-                "label": "Pixel-artist-Z Character LoRA",
+                "label": "SkyAsl/Pixel-artist-Z",
                 "value": "sprite_foundry_lora_skyasl_pixel_artist",
-                "description": "Alternative character pixel-art LoRA"
+                "description": "Alternative pixel-art LoRA"
               },
               {
-                "label": "Pixel Art Style LoRA",
+                "label": "tarn59/pixel_art_style_lora_z_image_turbo",
                 "value": "sprite_foundry_lora_tarn59_pixel_art",
                 "description": "Alternative pixel-art style LoRA"
               }
@@ -152,7 +152,7 @@
           }
         ],
         "submit": {
-          "label": "Fetch ControlNet"
+          "label": "Fetch Selected"
         }
       }
     ],

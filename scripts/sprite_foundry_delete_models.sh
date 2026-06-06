@@ -55,17 +55,15 @@ if [[ "${confirmed}" != "true" ]]; then
   exit 2
 fi
 
-delete_lora_profile() {
-  local library_id="$1"
-  local library_file="$2"
-  local repo_dir="$3"
-  local repo_file="$4"
+delete_lora_files() {
+  local label="$1"
+  shift
   local deleted=0
-  local candidates=(
-    "${SPRITE_FOUNDRY_LORA_ROOT}/${library_id}/${library_file}"
-    "${SPRITE_FOUNDRY_LORA_ROOT}/${library_file}"
-    "${SPRITE_FOUNDRY_LORA_ROOT}/${repo_dir}/${repo_file}"
-  )
+  local candidates=()
+  local relative_path
+  for relative_path in "$@"; do
+    candidates+=("${SPRITE_FOUNDRY_LORA_ROOT}/${relative_path}")
+  done
   local file_path
   for file_path in "${candidates[@]}"; do
     case "${file_path}" in
@@ -83,33 +81,34 @@ delete_lora_profile() {
     fi
   done
   if [[ "${deleted}" -eq 0 ]]; then
-    echo "Sprite Foundry LoRA already absent: ${library_file}"
+    echo "Sprite Foundry LoRA already absent: ${label}"
   fi
 }
 
 case "${profile}" in
-  sprite_foundry_lora_mks0813_pixel_art|mks0813_pixel_art)
-    delete_lora_profile \
-      "mks0813_pixel_art" \
-      "mks0813_pixel_art.safetensors" \
-      "mks0813--z-image-turbo-pixel-lora" \
-      "epoch-1.safetensors"
+  sprite_foundry_lora_mks0813_pixel_art|mks0813_pixel_art|mks0813--z-image-turbo-pixel-art-lora)
+    delete_lora_files \
+      "mks0813--z-image-turbo-pixel-art-lora" \
+      "mks0813--z-image-turbo-pixel-art-lora/z-image-turbo-pixel-art-lora.safetensors" \
+      "mks0813_pixel_art/mks0813_pixel_art.safetensors" \
+      "mks0813--z-image-turbo-pixel-lora/epoch-1.safetensors" \
+      "mks0813_pixel_art.safetensors"
     exit 0
     ;;
-  sprite_foundry_lora_skyasl_pixel_artist|skyasl_pixel_artist)
-    delete_lora_profile \
-      "skyasl_pixel_artist" \
-      "skyasl_pixel_artist.safetensors" \
+  sprite_foundry_lora_skyasl_pixel_artist|skyasl_pixel_artist|SkyAsl--Pixel-artist-Z)
+    delete_lora_files \
       "SkyAsl--Pixel-artist-Z" \
-      "adapter_model.safetensors"
+      "SkyAsl--Pixel-artist-Z/adapter_model.safetensors" \
+      "skyasl_pixel_artist/skyasl_pixel_artist.safetensors" \
+      "skyasl_pixel_artist.safetensors"
     exit 0
     ;;
-  sprite_foundry_lora_tarn59_pixel_art|tarn59_pixel_art)
-    delete_lora_profile \
-      "tarn59_pixel_art" \
-      "tarn59_pixel_art.safetensors" \
+  sprite_foundry_lora_tarn59_pixel_art|tarn59_pixel_art|tarn59--pixel_art_style_lora_z_image_turbo)
+    delete_lora_files \
       "tarn59--pixel_art_style_lora_z_image_turbo" \
-      "pixel_art_style_z_image_turbo.safetensors"
+      "tarn59--pixel_art_style_lora_z_image_turbo/pixel_art_style_z_image_turbo.safetensors" \
+      "tarn59_pixel_art/tarn59_pixel_art.safetensors" \
+      "tarn59_pixel_art.safetensors"
     exit 0
     ;;
   "${SPRITE_FOUNDRY_CONTROLNET_PROFILE}"|zimage_controlnet_2_1)
