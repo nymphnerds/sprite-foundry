@@ -5,6 +5,27 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/),
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [1.2.3] - 2026-06-06
+
+### Fixed
+
+- Fixed `foundry_generate` rejecting UI-encoded `--lora-trigger-b64-*`
+  arguments before generation could reach Z-Image/Nunchaku.
+- Fixed the Foundry CLI bridge for direction review actions. The UI can still
+  work by run ID and direction, but the wrapper now resolves that selection to
+  the real attempt ID expected by `foundry review-accept` and
+  `foundry review-reject`.
+- Fixed the `subject-add` bridge command to match the real Foundry CLI
+  signature.
+- Added Sprite Foundry status reporting for Z-Image install/running/model state
+  and available Z-Image pixel-art LoRAs, so the workbench no longer guesses
+  backend readiness.
+- Disabled generation until ControlNet, Z-Image models, Z-Image backend, and a
+  selectable LoRA are ready.
+- Disabled run-scoped Foundry lifecycle buttons until a run ID exists, replacing
+  the previous `--run-id is required` trap.
+- Expanded run ID parsing to understand both `Run:` and `run_id:` output.
+
 ## [1.2.2] - 2026-06-06
 
 ### Changed

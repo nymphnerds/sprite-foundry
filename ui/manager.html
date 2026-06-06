@@ -911,6 +911,7 @@
       });
       if (!value) {
         updateStripControls();
+        updateFoundryControls();
       }
       $("status-pill").textContent = value ? label : statusLabel();
       $("status-pill").className = value ? "status-pill warn" : statusClass();
@@ -1043,15 +1044,17 @@
       const spriteLoraTotal = loraAvailableIds(values).length;
       const spriteLoraDownloaded = list(values.weight_profiles_downloaded).filter((id) => loraMetadata[canonicalLoraId(id)]).length || loras.filter((id) => loraMetadata[canonicalLoraId(id)]).length;
       const zReady = yes(values.zimage_models_ready);
+      const zRunning = yes(values.zimage_running);
+      const controlReady = yes(values.controlnet_ready);
       if (!state.zModelTouched) $("z-model-choice").value = zModelChoiceFromStatus(values);
 
       $("status-pill").textContent = statusLabel();
       $("status-pill").className = statusClass();
-      $("runtime-chip").textContent = values.health === "ok" ? "ready" : "check";
+      $("runtime-chip").textContent = zRunning ? "ready" : "start backend";
       $("model-chip").textContent = zModelChipText();
-      $("runtime-text").textContent = values.zimage_url ? `Backend ${values.zimage_url} / ${zReady ? "models ready" : "fetch models"}` : "Backend";
+      $("runtime-text").textContent = values.zimage_url ? `Backend ${values.zimage_url} / ${zRunning ? "running" : "not running"} / ${zReady ? "models ready" : "fetch models"}` : "Backend";
       $("selected-model-text").textContent = values.selected_lora_path ? basename(values.selected_lora_path) : (loras.join(", ") || "none");
-      $("progress-detail").textContent = `Backend ${zReady ? "ready" : "missing"} | LoRA ${spriteLoraDownloaded}/${spriteLoraTotal}`;
+      $("progress-detail").textContent = `Backend ${zRunning && zReady ? "ready" : "not ready"} | ControlNet ${controlReady ? "ready" : "missing"} | LoRA ${spriteLoraDownloaded}/${spriteLoraTotal}`;
       populateLoraChoices(values);
       if (values.selected_lora_trigger) $("lora-trigger").value = values.selected_lora_trigger;
       if (values.selected_lora_scale) $("lora-scale").value = values.selected_lora_scale;
@@ -1059,6 +1062,7 @@
       const trigger = loraTriggerFor($("lora-choice").value, selectedOption?.dataset.path || "");
       if (trigger) $("lora-trigger").value = trigger;
       setProgress("Idle", $("progress-detail").textContent, 0);
+      updateFoundryControls();
     }
 
     function pathToFileUrl(path) {
@@ -1636,8 +1640,50 @@
     }
 
     function parseRunId(text) {
-      const match = String(text || "").match(/^Run:\s*([A-Za-z0-9_.:-]+)/m);
-      if (match) $("run-id").value = match[1];
+      const match = String(text || "").match(/^(?:Run|run_id):\s*([A-Za-z0-9_.:-]+)/m);
+      if (match) {
+        $("run-id").value = match[1];
+        updateFoundryControls();
+      }
+    }
+
+    function hasRunId() {
+      return Boolean(value("run-id"));
+    }
+
+    function generationReadyReason() {
+      const values = state.statusValues || {};
+      if (!yes(values.controlnet_ready)) return "Fetch ControlNet from the Sprite Foundry details page first.";
+      if (!yes(values.zimage_models_ready)) return "Fetch the Z-Image base/Nunchaku model files first.";
+      if (!yes(values.zimage_running)) return "Start or open Nymphs Image / Z-Image before generating.";
+      if (!$("lora-choice").value || !state.selectedLoraPath) return "Download or choose a Z-Image pixel-art LoRA first.";
+      return "";
+    }
+
+    function updateFoundryControls() {
+      const runReady = hasRunId();
+      const generationBlocker = generationReadyReason();
+      $("generate-foundry").disabled = state.busy || Boolean(generationBlocker);
+      $("generate-foundry").title = generationBlocker || "Generate a Sprite Foundry run.";
+      const runButtons = [
+        "foundry-check",
+        "foundry-review",
+        "foundry-winner",
+        "foundry-accept",
+        "foundry-reject",
+        "foundry-batch-accept",
+        "foundry-produce",
+        "foundry-export",
+        "foundry-lineage",
+        "foundry-drift",
+      ];
+      for (const id of runButtons) {
+        const button = $(id);
+        button.disabled = state.busy || !runReady;
+        button.title = runReady ? "Run this Foundry action on the current run." : "Generate a run first.";
+      }
+      $("foundry-metrics").disabled = state.busy;
+      $("foundry-metrics").title = "Show Foundry metrics.";
     }
 
     function foundryCommandArgs(command) {
@@ -1652,6 +1698,11 @@
 
     async function runFoundryCommand(command, stage = "Foundry") {
       if (state.busy) return;
+      const runScoped = !["metrics"].includes(command);
+      if (runScoped && !hasRunId()) {
+        setProgress(stage, "Generate a run first.", 0);
+        return;
+      }
       setProgress(stage, command, 20);
       setBusy(true, stage);
       try {
@@ -1761,6 +1812,7 @@
       state.selectedLoraPath = option?.dataset.path || "";
       const trigger = loraTriggerFor($("lora-choice").value, state.selectedLoraPath);
       if (trigger) $("lora-trigger").value = trigger;
+      updateFoundryControls();
     });
     $("z-model-choice").addEventListener("change", () => {
       state.zModelTouched = true;
@@ -1797,6 +1849,7 @@
     $("prompt-preset").addEventListener("change", () => applyPromptPreset($("prompt-preset").value));
     $("subject-prompt").addEventListener("input", markPromptCustom);
     $("negative-prompt").addEventListener("input", markPromptCustom);
+    $("run-id").addEventListener("input", updateFoundryControls);
     $("generate-foundry").addEventListener("click", runGeneration);
     $("foundry-check").addEventListener("click", () => runFoundryCommand("check", "Gates"));
     $("foundry-review").addEventListener("click", () => runFoundryCommand("review-show", "Review"));

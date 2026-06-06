@@ -25,6 +25,7 @@ subject_id=""
 subject_prompt_parts=()
 negative_prompt_parts=()
 lora_path_parts=()
+lora_trigger_parts=()
 extra_args=()
 
 while [[ $# -gt 0 ]]; do
@@ -71,6 +72,10 @@ while [[ $# -gt 0 ]]; do
       ;;
     --lora-trigger)
       lora_trigger="$2"
+      shift 2
+      ;;
+    --lora-trigger-b64-*)
+      lora_trigger_parts+=("${1#--lora-trigger-b64-}=$2")
       shift 2
       ;;
     --lora-scale)
@@ -149,6 +154,10 @@ negative_prompt="$(decode_b64_chunks "${negative_prompt_parts[@]}")"
 decoded_lora_path="$(decode_b64_chunks "${lora_path_parts[@]}")"
 if [[ -n "${decoded_lora_path}" ]]; then
   lora_path="${decoded_lora_path}"
+fi
+decoded_lora_trigger="$(decode_b64_chunks "${lora_trigger_parts[@]}")"
+if [[ -n "${decoded_lora_trigger}" ]]; then
+  lora_trigger="${decoded_lora_trigger}"
 fi
 
 if [[ "${generation_path}" == "nymphscore" && -n "${subject_prompt}" ]]; then

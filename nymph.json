@@ -3,7 +3,7 @@
   "id": "sprite-foundry",
   "name": "Sprite Foundry",
   "short_name": "SF",
-  "version": "1.2.2",
+  "version": "1.2.3",
   "description": "Foundry-native 8-direction sprite generation, review, lifecycle, and export pipeline for NymphsCore.",
   "category": "image",
   "kind": "sprite-foundry",

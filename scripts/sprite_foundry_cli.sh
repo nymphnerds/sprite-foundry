@@ -84,6 +84,59 @@ require_code() {
   fi
 }
 
+resolve_attempt_id() {
+  if [[ -n "${attempt_id}" ]]; then
+    printf '%s\n' "${attempt_id}"
+    return 0
+  fi
+
+  require_run
+  require_direction
+
+  local resolved
+  resolved="$(
+    "${python_bin}" - "${root}/foundry.db" "${run_id}" "${direction}" <<'PY'
+from __future__ import annotations
+
+import sqlite3
+import sys
+from pathlib import Path
+
+db_path = Path(sys.argv[1])
+run_id = sys.argv[2]
+direction = sys.argv[3]
+if not db_path.is_file():
+    raise SystemExit(0)
+
+conn = sqlite3.connect(str(db_path))
+conn.row_factory = sqlite3.Row
+row = conn.execute(
+    """
+    SELECT id
+      FROM attempts
+     WHERE run_id = ? AND direction = ?
+     ORDER BY
+       CASE
+         WHEN state IN ('raw_review_pending', 'pixel_review_pending', 'finish_review_pending') THEN 0
+         ELSE 1
+       END,
+       id DESC
+     LIMIT 1
+    """,
+    (run_id, direction),
+).fetchone()
+conn.close()
+if row:
+    print(row["id"])
+PY
+  )"
+  if [[ -z "${resolved}" ]]; then
+    echo "ERROR: no attempt found for run '${run_id}' direction '${direction}'." >&2
+    exit 1
+  fi
+  printf '%s\n' "${resolved}"
+}
+
 cd "${root}"
 case "${command_name}" in
   status|metrics|drift)
@@ -106,21 +159,13 @@ case "${command_name}" in
     cmd=("${python_bin}" -m foundry.cli batch-reject "${run_id}" "--code" "${code}")
     ;;
   review-accept)
-    require_run
-    require_direction
-    cmd=("${python_bin}" -m foundry.cli review-accept "${run_id}" "${direction}")
-    if [[ -n "${attempt_id}" ]]; then
-      cmd+=("--attempt-id" "${attempt_id}")
-    fi
+    attempt_id="$(resolve_attempt_id)"
+    cmd=("${python_bin}" -m foundry.cli review-accept "${attempt_id}")
     ;;
   review-reject)
-    require_run
-    require_direction
     require_code
-    cmd=("${python_bin}" -m foundry.cli review-reject "${run_id}" "${direction}" "--code" "${code}")
-    if [[ -n "${attempt_id}" ]]; then
-      cmd+=("--attempt-id" "${attempt_id}")
-    fi
+    attempt_id="$(resolve_attempt_id)"
+    cmd=("${python_bin}" -m foundry.cli review-reject "${attempt_id}" "--code" "${code}")
     ;;
   attempt-detail|story)
     require_attempt
@@ -131,7 +176,7 @@ case "${command_name}" in
       echo "ERROR: --subject-id is required for subject-add" >&2
       exit 1
     fi
-    cmd=("${python_bin}" -m foundry.cli subject-add "${subject_id}" "${subject_id}")
+    cmd=("${python_bin}" -m foundry.cli subject-add "${subject_id}" "--name" "${subject_id}")
     ;;
   *)
     echo "ERROR: unsupported Foundry command: ${command_name}" >&2

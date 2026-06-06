@@ -106,6 +106,34 @@ This is not an end-user test. End-user testing still requires publishing the
 module repo, verifying raw `nymph.json`, updating registry only if needed, and
 installing/updating through Manager.
 
+## 2026-06-06 Feature-Fix Pass
+
+Version `1.2.3` fixes the first broken module workbench path found during
+Manager testing:
+
+- The workbench was sending `--lora-trigger-b64-*`, but
+  `scripts/sprite_foundry_generate.sh` only accepted plain `--lora-trigger`.
+  The generation wrapper now decodes that field the same way it already decoded
+  prompt and LoRA path chunks.
+- The UI was exposing run-scoped lifecycle commands before a run existed. Those
+  buttons now stay disabled until a run ID is present.
+- The review accept/reject bridge tried to pass `run_id + direction` to a
+  Foundry CLI command that actually expects an attempt ID. The wrapper now
+  resolves the selected run/direction to the latest review-pending attempt, or
+  fails clearly if no attempt exists.
+- Sprite Foundry status now reports Z-Image installed/running/model state and
+  Z-Image pixel LoRA choices. The UI uses that to disable generation until
+  ControlNet, backend models, backend runtime, and a LoRA are ready.
+
+This pass does not prove end-to-end ControlNet generation. It makes the module
+feature path testable again. The next real test is still:
+
+```text
+publish 1.2.3 -> update registry -> Manager update on test WSL ->
+open Sprite Foundry UI -> start/open Z-Image -> verify ready state ->
+run one Sprite Foundry generation
+```
+
 ## Next Work
 
 - Continue wiring the Manager-hosted UI as a full Sprite Foundry workbench, not
