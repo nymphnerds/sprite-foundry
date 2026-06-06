@@ -14,6 +14,7 @@ state="available"
 health="unavailable"
 detail="${SPRITE_FOUNDRY_MODULE_NAME} is not installed."
 controlnet_ready=false
+weight_profiles_available="sprite_foundry_controlnet_2_1,sprite_foundry_lora_mks0813_pixel_art,sprite_foundry_lora_skyasl_pixel_artist,sprite_foundry_lora_tarn59_pixel_art"
 weight_profiles_downloaded="none"
 weight_profiles_missing="${SPRITE_FOUNDRY_CONTROLNET_PROFILE}"
 models_ready=false
@@ -40,8 +41,6 @@ selected_lora_scale="1"
 
 if sprite_foundry_controlnet_ready; then
   controlnet_ready=true
-  weight_profiles_downloaded="${SPRITE_FOUNDRY_CONTROLNET_PROFILE}"
-  weight_profiles_missing="none"
 fi
 
 lora_status="$(
@@ -148,6 +147,36 @@ while IFS='=' read -r key value; do
   esac
 done <<< "${lora_status}"
 
+downloaded_fetch_profiles=()
+missing_fetch_profiles=()
+if [[ "${controlnet_ready}" == "true" ]]; then
+  downloaded_fetch_profiles+=("${SPRITE_FOUNDRY_CONTROLNET_PROFILE}")
+else
+  missing_fetch_profiles+=("${SPRITE_FOUNDRY_CONTROLNET_PROFILE}")
+fi
+case ",${downloaded_loras}," in
+  *,mks0813_pixel_art,*) downloaded_fetch_profiles+=(sprite_foundry_lora_mks0813_pixel_art) ;;
+  *) missing_fetch_profiles+=(sprite_foundry_lora_mks0813_pixel_art) ;;
+esac
+case ",${downloaded_loras}," in
+  *,skyasl_pixel_artist,*) downloaded_fetch_profiles+=(sprite_foundry_lora_skyasl_pixel_artist) ;;
+  *) missing_fetch_profiles+=(sprite_foundry_lora_skyasl_pixel_artist) ;;
+esac
+case ",${downloaded_loras}," in
+  *,tarn59_pixel_art,*) downloaded_fetch_profiles+=(sprite_foundry_lora_tarn59_pixel_art) ;;
+  *) missing_fetch_profiles+=(sprite_foundry_lora_tarn59_pixel_art) ;;
+esac
+if [[ ${#downloaded_fetch_profiles[@]} -gt 0 ]]; then
+  weight_profiles_downloaded="$(IFS=,; printf '%s' "${downloaded_fetch_profiles[*]}")"
+else
+  weight_profiles_downloaded=none
+fi
+if [[ ${#missing_fetch_profiles[@]} -gt 0 ]]; then
+  weight_profiles_missing="$(IFS=,; printf '%s' "${missing_fetch_profiles[*]}")"
+else
+  weight_profiles_missing=none
+fi
+
 if zimage_status_script="$(sprite_foundry_zimage_script zimage_status.sh 2>/dev/null)"; then
   zimage_status_output="$("${zimage_status_script}" 2>/dev/null || true)"
   while IFS='=' read -r key value; do
@@ -249,11 +278,11 @@ printf 'controlnet_ready=%s\n' "${controlnet_ready}"
 printf 'controlnet_profile=%s\n' "${SPRITE_FOUNDRY_CONTROLNET_PROFILE}"
 printf 'controlnet_weight=%s/%s\n' "${SPRITE_FOUNDRY_CONTROLNET_REPO}" "${SPRITE_FOUNDRY_CONTROLNET_FILE}"
 printf 'models_ready=%s\n' "${models_ready}"
-printf 'weight_profile_selected=%s\n' "${SPRITE_FOUNDRY_CONTROLNET_PROFILE}"
-printf 'weight_profiles_available=%s\n' "${SPRITE_FOUNDRY_CONTROLNET_PROFILE}"
+printf 'weight_profile_selected=%s\n' "sprite_foundry_starter_stack"
+printf 'weight_profiles_available=%s\n' "${weight_profiles_available}"
 printf 'weight_profiles_downloaded=%s\n' "${weight_profiles_downloaded}"
 printf 'weight_profiles_missing=%s\n' "${weight_profiles_missing}"
-printf 'weight_profile_ready=%s\n' "${controlnet_ready}"
+printf 'weight_profile_ready=%s\n' "${models_ready}"
 printf 'downloaded_loras=%s\n' "${downloaded_loras}"
 printf 'lora_choices=%s\n' "${lora_choices}"
 printf 'selected_lora_candidate=%s\n' "${selected_lora_candidate}"

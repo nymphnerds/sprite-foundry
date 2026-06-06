@@ -134,6 +134,29 @@ open Sprite Foundry UI -> start/open Z-Image -> verify ready state ->
 run one Sprite Foundry generation
 ```
 
+## 2026-06-06 Sprite-Owned Fetch Pass
+
+Version `1.2.4` moves the visible asset preparation workflow back under Sprite
+Foundry:
+
+- Sprite Foundry Details now exposes a `Model Fetch` dropdown for the starter
+  stack, ControlNet, all bundled LoRAs, and individual pixel-art LoRAs.
+- LoRAs fetched from Sprite Foundry are written to the shared LoRA folder used
+  by the LoRA module and Z-Image:
+
+```text
+$HOME/LoRA/loras
+```
+
+- Z-Image backend weights and ControlNet still use the shared Nymphs Hugging
+  Face cache. Sprite Foundry owns the action, while Nymphs Image owns the
+  backend fetch implementation for Z-Image weights.
+- Sprite Foundry status reports those shared LoRA files as Sprite Foundry cache
+  profiles so the Manager Details page can show them as downloaded.
+- Cache deletion is scoped to known Sprite Foundry LoRA filenames and the
+  ControlNet weight. It does not touch user-trained LoRAs, datasets, jobs,
+  outputs, logs, or runtime files.
+
 ## Next Work
 
 - Continue wiring the Manager-hosted UI as a full Sprite Foundry workbench, not

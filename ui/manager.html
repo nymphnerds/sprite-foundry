@@ -965,7 +965,7 @@
     }
 
     function loraAvailableIds(values) {
-      const available = list(values.weight_profiles_available).filter((id) => loraMetadata[id]);
+      const available = list(values.weight_profiles_available).filter((id) => loraMetadata[canonicalLoraId(id)]);
       if (available.length) return available;
       return Object.keys(loraMetadata);
     }
