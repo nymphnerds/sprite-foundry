@@ -875,7 +875,10 @@
       selectedLoraPath: "",
       zModelTouched: false,
       statusValues: {},
+      activeRunOutputDir: "",
+      activeDirection: "",
     };
+    const generationDirections = ["front", "front_left", "left", "back_left", "back", "back_right", "right", "front_right"];
 
     function escapeHtml(value) {
       return String(value).replace(/[&<>"']/g, (char) => ({
@@ -1044,11 +1047,7 @@
       }
       const normalized = String(path).replace(/\\/g, "/");
       const roots = [
-        { marker: "/NymphsData/outputs/sprite-foundry/", source: "outputs" },
-        { marker: "/Sprite-Foundry/bakeoff/", source: "bakeoff" },
-        { marker: "/Sprite-Foundry/exports/", source: "exports" },
-        { marker: "/NymphsModules/sprite-foundry/bakeoff/", source: "bakeoff" },
-        { marker: "/NymphsModules/sprite-foundry/exports/", source: "exports" }
+        { marker: "/NymphsData/outputs/sprite-foundry/", source: "outputs" }
       ];
       for (const root of roots) {
         const index = normalized.indexOf(root.marker);
@@ -1097,10 +1096,17 @@
 
     function parseOutputPaths(text) {
       for (const line of String(text || "").split(/\r?\n/)) {
+        const outputDir = line.match(/^\s*Output:\s+(.+)\s*$/);
+        if (outputDir) state.activeRunOutputDir = outputDir[1].trim();
         const kv = line.match(/^(sprite_contact_sheet|output_[A-Za-z0-9_]+)=([^\r\n]+)$/);
         if (kv) addOutput(kv[2].trim(), kv[1].replace(/^output_/, ""));
         const named = line.match(/^\s*(Raw inspection|Pixel contact):\s+(.+\.(?:png|jpg|jpeg|webp))\s*$/i);
         if (named) addOutput(named[2].trim(), named[1].toLowerCase());
+        const directionDone = line.match(/^\s*\[([a-z_]+)\]\s+generate\b.*\bOK\b/);
+        if (directionDone && state.activeRunOutputDir) {
+          const direction = directionDone[1];
+          addOutput(`${state.activeRunOutputDir}/${direction}.png`, direction);
+        }
       }
       const jsonPaths = [...String(text || "").matchAll(/"output_path"\s*:\s*"([^"]+)"/g)]
         .map((match) => match[1].replace(/\\\//g, "/"));
@@ -1117,12 +1123,34 @@
     function parseProgress(text) {
       const line = String(text || "").trim();
       if (!line) return;
-      if (line.includes("MODEL FETCH STATUS") || line.includes("LORA FETCH STATUS")) {
+      const direction = line.match(/^\[([a-z_]+)\]\s+generate\b/i);
+      if (direction) {
+        const name = direction[1].toLowerCase();
+        const index = generationDirections.indexOf(name);
+        state.activeDirection = name;
+        const done = /\bOK\b/.test(line);
+        const failed = /\bFAIL\b/.test(line);
+        const ordinal = index >= 0 ? index + (done || failed ? 1 : 0) : 0;
+        const percent = 15 + (Math.max(0, ordinal) / generationDirections.length) * 75;
+        const label = name.replace(/_/g, " ");
+        const detail = failed ? `${label} failed` : done ? `${label} complete` : `${label} generating`;
+        setProgress(failed ? "Error" : "Generate", detail, failed ? 0 : percent);
+      } else if (line.includes("Starting backend")) {
+        setProgress("Backend", "Starting Nymphs Image / Z-Image.", 10);
+      } else if (line.includes("Backend ready") || line.includes("Backend already running")) {
+        setProgress("Backend", "Backend ready.", 15);
+      } else if (line.includes("No Z-Image LoRA weights matched")) {
+        setProgress("Error", "Selected LoRA is incompatible with this Nunchaku runtime.", 0);
+      } else if (line.includes("MODEL FETCH STATUS") || line.includes("LORA FETCH STATUS")) {
         setProgress("Fetch", line.replace(/\s+/g, " "), 45);
       } else if (line.startsWith("generate=")) {
         setProgress("Generate", line, 65);
       } else if (line.startsWith("sprite_contact_sheet=")) {
         setProgress("Done", "Contact sheet ready.", 100);
+      } else if (line.includes("Raw inspection:") || line.includes("Pixel contact:")) {
+        setProgress("Done", "Contact sheet ready.", 98);
+      } else if (line.includes("GENERATION COMPLETE")) {
+        setProgress("Done", "Foundry run ready.", 100);
       } else if (line.startsWith("batch_id=")) {
         setProgress("Batch", line, 20);
       }

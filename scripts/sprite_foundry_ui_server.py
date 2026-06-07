@@ -31,10 +31,6 @@ class SpriteFoundryUiServer(ThreadingHTTPServer):
     def _output_sources(self) -> list[tuple[str, Path]]:
         sources = [
             ("outputs", self.output_root),
-            ("bakeoff", self.root / "bakeoff"),
-            ("exports", self.root / "exports"),
-            ("boards", self.root / "boards"),
-            ("derived", self.root / "derived"),
         ]
         resolved: list[tuple[str, Path]] = []
         seen: set[Path] = set()

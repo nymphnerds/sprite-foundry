@@ -5,6 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/),
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [1.2.7] - 2026-06-07
+
+### Fixed
+
+- NymphsCore/Z-Image generation now writes final Sprite Foundry images directly
+  to `$HOME/NymphsData/outputs/sprite-foundry/<subject_id>/` with simple names
+  such as `front.png`, `front_raw.png`, and `contact_sheet.png`.
+- `Open Outputs` now opens `$HOME/NymphsData/outputs/sprite-foundry`.
+- The UI now updates progress direction by direction during generation.
+- Generation now fails fast with a clear message when the selected LoRA cannot
+  attach to the current Z-Image/Nunchaku transformer.
+
 ## [1.2.6] - 2026-06-06
 
 ### Fixed

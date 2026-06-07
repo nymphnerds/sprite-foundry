@@ -3,7 +3,7 @@
   "id": "sprite-foundry",
   "name": "Sprite Foundry",
   "short_name": "SF",
-  "version": "1.2.6",
+  "version": "1.2.7",
   "description": "Foundry-native 8-direction sprite generation, review, lifecycle, and export pipeline for NymphsCore.",
   "category": "image",
   "kind": "sprite-foundry",
@@ -36,8 +36,6 @@
     "outputs_root": "$HOME/NymphsData/outputs/sprite-foundry",
     "config_root": "$HOME/NymphsData/config/sprite-foundry",
     "logs_root": "$HOME/NymphsData/logs/sprite-foundry",
-    "foundry_bakeoff_root": "$HOME/Sprite-Foundry/bakeoff",
-    "foundry_exports_root": "$HOME/Sprite-Foundry/exports",
     "lora_root": "$HOME/LoRA/loras",
     "zimage_url": "http://127.0.0.1:8090"
   },

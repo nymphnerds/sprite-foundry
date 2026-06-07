@@ -293,10 +293,15 @@ def generate_and_register(config: dict[str, Any], args: argparse.Namespace) -> s
 
     ts = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S")
     run_id = f"{subject_id}_nymphscore_{ts}"
-    out_dir = FOUNDRY_ROOT / "bakeoff" / run_id
-    backend_dir = Path.home() / "NymphsData" / "outputs" / "sprite-foundry" / run_id / "backend"
+    out_dir = Path.home() / "NymphsData" / "outputs" / "sprite-foundry" / subject_id
+    backend_dir = Path.home() / "NymphsData" / "tmp" / "sprite-foundry" / run_id / "backend"
     out_dir.mkdir(parents=True, exist_ok=True)
     backend_dir.mkdir(parents=True, exist_ok=True)
+    for direction_name, _ in DIRECTIONS:
+        for suffix in (".png", "_raw.png", "_raw.json"):
+            (out_dir / f"{direction_name}{suffix}").unlink(missing_ok=True)
+    for filename in ("raw_inspection.png", "contact_sheet.png", "recipe.json", "manifest.json"):
+        (out_dir / filename).unlink(missing_ok=True)
 
     print(f"\n{'=' * 60}")
     print(f"NYMPHSCORE GENERATION: {display_name}")
@@ -332,7 +337,13 @@ def generate_and_register(config: dict[str, Any], args: argparse.Namespace) -> s
             if source is None or not source.exists():
                 raise RuntimeError(f"missing output_path in response: {response}")
         except Exception as exc:
-            print(f"FAIL: {exc}")
+            message = str(exc)
+            print(f"FAIL: {message}")
+            if "No Z-Image LoRA weights matched" in message:
+                raise SystemExit(
+                    "Selected LoRA is not compatible with the current Z-Image Nunchaku transformer. "
+                    "Choose another Z-Image LoRA or fetch a compatible Sprite Foundry LoRA profile."
+                ) from exc
             continue
 
         raw_path = out_dir / f"{direction_name}_raw.png"
