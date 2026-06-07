@@ -90,6 +90,12 @@ Public registry state:
 
 Nymphs Image / Z-Image `0.1.112` is pushed and referenced by the public registry.
 
+Detailed ControlNet research and Sprite UI ideas are captured in:
+
+```text
+docs/CONTROLNET_RESEARCH.md
+```
+
 - Z-Image commit: `1076303`
 - Z-Image message: `Fix Z-Image ControlNet VRAM path`
 - Registry commit for Z-Image `0.1.112`: `fd5f57f`
